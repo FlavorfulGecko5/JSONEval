@@ -7,6 +7,11 @@ class DecimalOperand : Operand
         value = vParam;
     }
 
+    public DecimalOperand(string vParam)
+    {
+        value = Double.Parse(vParam);
+    }
+
     public override string ToString()
     {
         return value.ToString();

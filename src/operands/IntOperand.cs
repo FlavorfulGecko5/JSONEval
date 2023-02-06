@@ -7,6 +7,11 @@ class IntOperand : Operand
         value = vParam;
     }
 
+    public IntOperand(string vParam)
+    {
+        value = Int32.Parse(vParam);
+    }
+
     public override string ToString()
     {
         return value.ToString();
