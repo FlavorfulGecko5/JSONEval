@@ -23,9 +23,21 @@ class BoolOperand : Operand
         }
     }
 
+    public override Operand UnaryAdd()
+    {
+        throw new Exception("Cannot unary add a boolean");
+    }
+
     public override Operand Sub(Operand b)
     {
         throw new Exception("Cannot subtract from boolean");
+    }
+
+    // Unary subtraction functions as logical NOT for booleans
+    public override Operand UnarySub()
+    {
+        value = !value;
+        return this;
     }
 
     public override Operand Mult(Operand b)

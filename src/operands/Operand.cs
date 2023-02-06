@@ -2,7 +2,11 @@ abstract class Operand
 {
     public abstract Operand Add(Operand b);
 
+    public abstract Operand UnaryAdd();
+
     public abstract Operand Sub(Operand b);
+
+    public abstract Operand UnarySub();
 
     public abstract Operand Mult(Operand b);
 

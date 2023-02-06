@@ -32,6 +32,11 @@ class IntOperand : Operand
         }
     }
 
+    public override Operand UnaryAdd()
+    {
+        return this;
+    }
+
     public override Operand Sub(Operand b)
     {
         switch (b)
@@ -43,6 +48,12 @@ class IntOperand : Operand
             default:
                 throw new Exception("Cannot subtract this type from an Integer");
         }
+    }
+
+    public override Operand UnarySub()
+    {
+        value *= -1;
+        return this;
     }
 
     public override Operand Mult(Operand b)

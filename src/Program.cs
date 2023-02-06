@@ -8,8 +8,12 @@
 
 class Parser
 {
+    const char SYM_UNARY_ADDITION = 'a';
+    const char SYM_UNARY_SUBTRACTION = 's';
+    const int PRECEDENCE_UNARY = 5000;
     static readonly Dictionary<char, int> precedence = new Dictionary<char, int>()
     {
+        {SYM_UNARY_ADDITION, PRECEDENCE_UNARY}, {SYM_UNARY_SUBTRACTION, PRECEDENCE_UNARY},
         {'*', 2000}, {'/', 2000}, {'%', 2000},
         {'+', 1000}, {'-', 1000},
 
@@ -54,12 +58,37 @@ class Parser
                 activeOperand += c; // Possible alternative - track start index and length then take substring?
                 break;
 
-                case '*': case '/': case '%': case '+': case '-':
+                case '+':
                 TryPushOperand();
+                if(lastToken != TokenType.OPERAND)
+                    c = SYM_UNARY_ADDITION;
+                goto LABEL_EVAL;
+
+                case '-':
+                TryPushOperand();
+                if(lastToken != TokenType.OPERAND)
+                    c = SYM_UNARY_SUBTRACTION;
+                goto LABEL_EVAL;
+
+                case '*': 
+                TryPushOperand();
+                goto LABEL_EVAL;
+
+                case '/': 
+                TryPushOperand();
+                goto LABEL_EVAL;
+
+                case '%':
+                TryPushOperand();
+                goto LABEL_EVAL;
+
+                LABEL_EVAL:
                 while(operators.Count > 0)
                 {
                     // <= instead of < Causes left-right evaluation instead of right-left
-                    if(precedence[c] <= precedence[operators.Peek()])
+                    // For unary operations - we need to ensure right-left evaluation
+                    // This current setup relies on unary operators having the highest-precedence (other than sub-expressions)
+                    if((precedence[c] <= precedence[operators.Peek()]) && precedence[c] != PRECEDENCE_UNARY)
                         eval();
                     else
                         break;
@@ -101,10 +130,25 @@ class Parser
 
         void eval()
         {
-            Operand rightHand = operands.Pop();
-            Operand leftHand = operands.Pop();
             char op = operators.Pop();
+            Operand rightHand = operands.Pop();
 
+            if(precedence[op] == PRECEDENCE_UNARY)
+            {
+                switch(op)
+                {
+                    case SYM_UNARY_ADDITION:
+                        operands.Push(rightHand.UnaryAdd());
+                    break;
+
+                    case SYM_UNARY_SUBTRACTION:
+                        operands.Push(rightHand.UnarySub());
+                    break;
+                }
+                return;
+            }
+
+            Operand leftHand = operands.Pop();
             switch(op)
             {
                 case '*':
@@ -136,7 +180,8 @@ class Parser
                 If active operand length is 0:
                 - If first character read in operand is a number --> integer
                 - If first character read is decimal --> decimal
-                - If a decimal is read at some point and operand is an integer --> decimal
+                - If a period is read at some point and operand is an integer --> decimal
+                    - If a period is read and operand is a decimal --> throw a syntax error
                 - If first character read is a single quote --> string
                 - If first character read is a letter, underscore, or exclamation --> expression --> Fetch from variables and:
                     > If type is int, decimal or bool - push

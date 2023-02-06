@@ -30,9 +30,19 @@ class StringOperand : Operand
         }
     }
 
+    public override Operand UnaryAdd()
+    {
+        throw new Exception("Cannot unary add a string");
+    }
+
     public override Operand Sub(Operand b)
     {
         throw new Exception("Cannot subtract from a string");
+    }
+
+    public override Operand UnarySub()
+    {
+        throw new Exception("Cannot unary subtract a string");
     }
 
     public override Operand Mult(Operand b)

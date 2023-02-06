@@ -9,12 +9,23 @@ class ExpressionOperand : Operand
         value = vParam;
     }
 
+    // Future: Create multiple interfaces for different operand types
     public override Operand Add(Operand b)
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
+    public override Operand UnaryAdd()
+    {
+        throw new Exception("Cannot use operations with ExpressionOperands");
+    }
+
     public override Operand Sub(Operand b)
+    {
+        throw new Exception("Cannot use operations with ExpressionOperands");
+    }
+
+    public override Operand UnarySub()
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
