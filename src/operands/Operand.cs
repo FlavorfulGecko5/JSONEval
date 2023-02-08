@@ -1,16 +1,20 @@
-interface Operand
+interface Operand {}
+
+interface VariableOperand : Operand {}
+
+interface PrimitiveOperand : Operand
 {
-    public Operand Add(Operand b);
+    public PrimitiveOperand Add(PrimitiveOperand b);
 
-    public Operand UnaryAdd();
+    public PrimitiveOperand UnaryAdd();
 
-    public Operand Sub(Operand b);
+    public PrimitiveOperand Sub(PrimitiveOperand b);
 
-    public Operand UnarySub();
+    public PrimitiveOperand UnarySub();
 
-    public Operand Mult(Operand b);
+    public PrimitiveOperand Mult(PrimitiveOperand b);
 
-    public Operand Div(Operand b);
+    public PrimitiveOperand Div(PrimitiveOperand b);
 
-    public Operand Rem(Operand b);
+    public PrimitiveOperand Rem(PrimitiveOperand b);
 }

@@ -29,7 +29,7 @@ class Parser
 
     private string evaluate(ExpressionOperand expWrapper)
     {
-        Stack<Operand> operands = new Stack<Operand>();
+        Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
         string exp = expWrapper.value;
 
@@ -194,7 +194,7 @@ class Parser
         void eval()
         {
             char op = operators.Pop();
-            Operand rightHand = operands.Pop();
+            PrimitiveOperand rightHand = operands.Pop();
 
             if(precedence[op] == PRECEDENCE_UNARY)
             {
@@ -211,7 +211,7 @@ class Parser
                 return;
             }
 
-            Operand leftHand = operands.Pop();
+            PrimitiveOperand leftHand = operands.Pop();
             switch(op)
             {
                 case '*':
@@ -315,7 +315,7 @@ class Parser
 
     enum OperandTokenType
     {
-        NONE, // Should be equivalent to the current token having a length of 0
+        NONE,
         INTEGER,
         DECIMAL,
         STRING,

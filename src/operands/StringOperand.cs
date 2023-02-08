@@ -1,5 +1,5 @@
 // Only string literals read from expressions should use this
-class StringOperand : Operand
+class StringOperand : PrimitiveOperand
 {
     public string value { get; private set; }
 
@@ -13,7 +13,7 @@ class StringOperand : Operand
         return value;
     }
 
-    public Operand Add(Operand b)
+    public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -30,32 +30,32 @@ class StringOperand : Operand
         }
     }
 
-    public Operand UnaryAdd()
+    public PrimitiveOperand UnaryAdd()
     {
         throw new Exception("Cannot unary add a string");
     }
 
-    public Operand Sub(Operand b)
+    public PrimitiveOperand Sub(PrimitiveOperand b)
     {
         throw new Exception("Cannot subtract from a string");
     }
 
-    public Operand UnarySub()
+    public PrimitiveOperand UnarySub()
     {
         throw new Exception("Cannot unary subtract a string");
     }
 
-    public Operand Mult(Operand b)
+    public PrimitiveOperand Mult(PrimitiveOperand b)
     {
         throw new Exception("Cannot multiply a string");
     }
 
-    public Operand Div(Operand b)
+    public PrimitiveOperand Div(PrimitiveOperand b)
     {
         throw new Exception("Cannot divide a string");
     }
 
-    public Operand Rem(Operand b)
+    public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         throw new Exception("Cannot take the remainder of a string");
     }

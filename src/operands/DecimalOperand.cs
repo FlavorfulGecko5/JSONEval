@@ -1,4 +1,4 @@
-class DecimalOperand : Operand
+class DecimalOperand : PrimitiveOperand, VariableOperand
 {
     public double value { get; private set; }
 
@@ -17,7 +17,7 @@ class DecimalOperand : Operand
         return value.ToString();
     }
 
-    public Operand Add(Operand b)
+    public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -32,12 +32,12 @@ class DecimalOperand : Operand
         }
     }
 
-    public Operand UnaryAdd()
+    public PrimitiveOperand UnaryAdd()
     {
         return this;
     }
 
-    public Operand Sub(Operand b)
+    public PrimitiveOperand Sub(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -50,12 +50,12 @@ class DecimalOperand : Operand
         }
     }
 
-    public Operand UnarySub()
+    public PrimitiveOperand UnarySub()
     {
         return new DecimalOperand(value * -1);
     }
 
-    public Operand Mult(Operand b)
+    public PrimitiveOperand Mult(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -68,7 +68,7 @@ class DecimalOperand : Operand
         }
     }
 
-    public Operand Div(Operand b)
+    public PrimitiveOperand Div(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -81,7 +81,7 @@ class DecimalOperand : Operand
         }
     }
 
-    public Operand Rem(Operand b)
+    public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         switch (b)
         {

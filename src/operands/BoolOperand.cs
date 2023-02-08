@@ -1,4 +1,4 @@
-class BoolOperand : Operand
+class BoolOperand : PrimitiveOperand, VariableOperand
 {
     public bool value { get; private set; }
 
@@ -12,7 +12,7 @@ class BoolOperand : Operand
         return value.ToString();
     }
 
-    public Operand Add(Operand b)
+    public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -23,33 +23,33 @@ class BoolOperand : Operand
         }
     }
 
-    public Operand UnaryAdd()
+    public PrimitiveOperand UnaryAdd()
     {
         throw new Exception("Cannot unary add a boolean");
     }
 
-    public Operand Sub(Operand b)
+    public PrimitiveOperand Sub(PrimitiveOperand b)
     {
         throw new Exception("Cannot subtract from boolean");
     }
 
     // Unary subtraction functions as logical NOT for booleans
-    public Operand UnarySub()
+    public PrimitiveOperand UnarySub()
     {
         return new BoolOperand(!value);
     }
 
-    public Operand Mult(Operand b)
+    public PrimitiveOperand Mult(PrimitiveOperand b)
     {
         throw new Exception("Cannot multiply a boolean");
     }
 
-    public Operand Div(Operand b)
+    public PrimitiveOperand Div(PrimitiveOperand b)
     {
         throw new Exception("Cannot divide a boolean");
     }
 
-    public Operand Rem(Operand b)
+    public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         throw new Exception("Cannot take remainder of a boolean");
     }

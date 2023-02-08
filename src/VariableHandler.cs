@@ -13,7 +13,7 @@ Symbols:
 - Commas , - parameter delimiters
 */
 
-class VariableHandler : Dictionary<string, Operand>
+class VariableHandler : Dictionary<string, VariableOperand>
 {
     public VariableHandler() : base(StringComparer.OrdinalIgnoreCase) 
     {
