@@ -10,37 +10,37 @@ class ExpressionOperand : Operand
     }
 
     // Future: Create multiple interfaces for different operand types
-    public override Operand Add(Operand b)
+    public Operand Add(Operand b)
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
-    public override Operand UnaryAdd()
+    public Operand UnaryAdd()
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
-    public override Operand Sub(Operand b)
+    public Operand Sub(Operand b)
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
-    public override Operand UnarySub()
+    public Operand UnarySub()
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
-    public override Operand Mult(Operand b)
+    public Operand Mult(Operand b)
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
-    public override Operand Div(Operand b)
+    public Operand Div(Operand b)
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }
 
-    public override Operand Rem(Operand b)
+    public Operand Rem(Operand b)
     {
         throw new Exception("Cannot use operations with ExpressionOperands");
     }

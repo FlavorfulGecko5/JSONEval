@@ -1,16 +1,16 @@
-abstract class Operand
+interface Operand
 {
-    public abstract Operand Add(Operand b);
+    public Operand Add(Operand b);
 
-    public abstract Operand UnaryAdd();
+    public Operand UnaryAdd();
 
-    public abstract Operand Sub(Operand b);
+    public Operand Sub(Operand b);
 
-    public abstract Operand UnarySub();
+    public Operand UnarySub();
 
-    public abstract Operand Mult(Operand b);
+    public Operand Mult(Operand b);
 
-    public abstract Operand Div(Operand b);
+    public Operand Div(Operand b);
 
-    public abstract Operand Rem(Operand b);
+    public Operand Rem(Operand b);
 }

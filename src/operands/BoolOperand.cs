@@ -12,7 +12,7 @@ class BoolOperand : Operand
         return value.ToString();
     }
 
-    public override Operand Add(Operand b)
+    public Operand Add(Operand b)
     {
         switch (b)
         {
@@ -23,33 +23,33 @@ class BoolOperand : Operand
         }
     }
 
-    public override Operand UnaryAdd()
+    public Operand UnaryAdd()
     {
         throw new Exception("Cannot unary add a boolean");
     }
 
-    public override Operand Sub(Operand b)
+    public Operand Sub(Operand b)
     {
         throw new Exception("Cannot subtract from boolean");
     }
 
     // Unary subtraction functions as logical NOT for booleans
-    public override Operand UnarySub()
+    public Operand UnarySub()
     {
         return new BoolOperand(!value);
     }
 
-    public override Operand Mult(Operand b)
+    public Operand Mult(Operand b)
     {
         throw new Exception("Cannot multiply a boolean");
     }
 
-    public override Operand Div(Operand b)
+    public Operand Div(Operand b)
     {
         throw new Exception("Cannot divide a boolean");
     }
 
-    public override Operand Rem(Operand b)
+    public Operand Rem(Operand b)
     {
         throw new Exception("Cannot take remainder of a boolean");
     }

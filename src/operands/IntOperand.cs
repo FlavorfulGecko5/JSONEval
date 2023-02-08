@@ -17,7 +17,7 @@ class IntOperand : Operand
         return value.ToString();
     }
 
-    public override Operand Add(Operand b)
+    public Operand Add(Operand b)
     {
         switch (b)
         {
@@ -32,12 +32,12 @@ class IntOperand : Operand
         }
     }
 
-    public override Operand UnaryAdd()
+    public Operand UnaryAdd()
     {
         return this;
     }
 
-    public override Operand Sub(Operand b)
+    public Operand Sub(Operand b)
     {
         switch (b)
         {
@@ -50,12 +50,12 @@ class IntOperand : Operand
         }
     }
 
-    public override Operand UnarySub()
+    public Operand UnarySub()
     {
         return new IntOperand(value * -1);
     }
 
-    public override Operand Mult(Operand b)
+    public Operand Mult(Operand b)
     {
         switch (b)
         {
@@ -68,7 +68,7 @@ class IntOperand : Operand
         }
     }
 
-    public override Operand Div(Operand b)
+    public Operand Div(Operand b)
     {
         switch (b)
         {
@@ -81,7 +81,7 @@ class IntOperand : Operand
         }
     }
 
-    public override Operand Rem(Operand b)
+    public Operand Rem(Operand b)
     {
         switch (b)
         {
