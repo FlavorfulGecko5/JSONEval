@@ -15,10 +15,13 @@ Symbols:
 
 class VariableHandler : Dictionary<string, VariableOperand>
 {
-    public VariableHandler() : base(StringComparer.OrdinalIgnoreCase) 
+    public VariableHandler(bool isGlobalHandler) : base(StringComparer.OrdinalIgnoreCase) 
     {
-        addBoolOperand("true", true);
-        addBoolOperand("false", false);
+        if(isGlobalHandler)
+        {
+            addBoolOperand("true", true);
+            addBoolOperand("false", false);
+        }
     }
 
     public void addIntOperand(string name, int value)

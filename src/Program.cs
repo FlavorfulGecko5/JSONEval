@@ -20,14 +20,15 @@ class Parser
         {'(', -10000}, {')', -10000}
     };
 
-    VariableHandler vars = new VariableHandler();
+    public VariableHandler globalVars = new VariableHandler(true);
 
     public string evaluate(string exp)
     {
-        return evaluate(new ExpressionOperand(exp));
+        PrimitiveOperand result = evaluate(new ExpressionOperand(exp), new VariableHandler(false));
+        return result.ToString() ?? "How can this possibly return null?";
     }
 
-    private string evaluate(ExpressionOperand expWrapper)
+    private PrimitiveOperand evaluate(ExpressionOperand expWrapper, VariableHandler localVars)
     {
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
@@ -46,6 +47,14 @@ class Parser
             if(Char.IsWhiteSpace(c))
             {
                 TryPushOperand();
+                continue;
+            }
+
+            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            {
+                if(activeType == OperandTokenType.NONE)
+                    activeType = OperandTokenType.VARIABLE;
+                activeOperand += c;
                 continue;
             }
                 
@@ -187,7 +196,7 @@ class Parser
             eval();
         
         if(operands.Count == 1)
-            return operands.Pop().ToString() ?? "";
+            return operands.Pop();
         else
             throw new Exception("Evaluation Failed - Unbalanced stacks");
 
@@ -281,7 +290,26 @@ class Parser
                 break;
 
                 case OperandTokenType.VARIABLE:
-                // DO ME LATER
+                    bool isGlobal = globalVars.ContainsKey(activeOperand);
+                    bool isLocal = localVars.ContainsKey(activeOperand);
+
+                    // Checking for variable presence in both dictionaries shouldn't be necessary
+                    // if the rest of the code is put together properly
+                    if(!isGlobal && !isLocal)
+                        throw new Exception("Could not find variable '" + activeOperand + "'");
+                    
+                    VariableOperand varValue = isGlobal ? globalVars[activeOperand] : localVars[activeOperand];
+
+                    switch(varValue)
+                    {
+                        case IntOperand: case DecimalOperand: case BoolOperand:
+                        operands.Push((PrimitiveOperand)varValue);
+                        break;
+
+                        case ExpressionOperand v1:
+                        operands.Push(evaluate(v1, new VariableHandler(false)));
+                        break;
+                    }
                 break;
             }
 

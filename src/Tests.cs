@@ -63,6 +63,21 @@ class Tests
         assert(@"'\n'", "\n"); // Better way to test these would be by reading lines from a file
         assert(@"'\\hooray\\'", @"\hooray\");
         
+
+        // Iteration #5 basic variable tests
+        p.globalVars.addIntOperand("firstvar", 34);
+        assert("firstvar", "34");
+        assert("FIRSTVAR + 500", "534");
+        p.globalVars.addExpressionOperand("basicexpression", "1 + 2 + 3");
+        assert("basicexpression", "6");
+        assert("true", "True");
+        assert("FALSE", "False");
+        assert("true + ' big victory'", "True big victory");
+        assert("firstvar * basicexpression", "204");
+        p.globalVars.addExpressionOperand("nested", "basicexpression + firstvar");
+        assert("nested", "40");
+
+        
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
 
