@@ -52,8 +52,7 @@ class DecimalOperand : Operand
 
     public override Operand UnarySub()
     {
-        value *= -1;
-        return this;
+        return new DecimalOperand(value * -1);
     }
 
     public override Operand Mult(Operand b)

@@ -58,6 +58,69 @@ class Parser
                 activeOperand += c; // Possible alternative - track start index and length then take substring?
                 break;
 
+                case '.':
+                if(activeType == OperandTokenType.DECIMAL)
+                    throw new Exception("Extra decimal");
+                else if (activeType == OperandTokenType.NONE || activeType == OperandTokenType.INTEGER)
+                    activeType = OperandTokenType.DECIMAL;
+                activeOperand += c;
+                break;
+
+                case '\'':
+                if(activeType > OperandTokenType.NONE)
+                    throw new Exception("Transitioning to string with active operand");
+                activeType = OperandTokenType.STRING;
+
+                int stringEndIndex = -1;
+                for(int j = i+1; j < exp.Length; j++)
+                    if(exp[j] == '\'' && exp[j-1] != '`')
+                    {
+                        stringEndIndex = j;
+                        break;
+                    }
+                if(stringEndIndex == -1)
+                    throw new Exception("Could not find end to string");
+                
+                // At this point we know the start and end index of the string,
+                // and that the index before the end quote does not have a `
+                for(int j = i+1; j < stringEndIndex; j++)
+                    switch(exp[j])
+                    {
+                        case '`':
+                            if(exp[j+1] == '\'')
+                            {
+                                activeOperand += '\'';
+                                j++;
+                            }          
+                        break;
+
+                        case '\\':
+                        switch(exp[j+1]) // This can include the end quote if before it
+                        {
+                            // All JSON-supported escape sequences
+                            case '\\': activeOperand += '\\'; break;
+                            case 'n': activeOperand += '\n'; break;
+                            case 't': activeOperand += '\t'; break;
+                            case 'b': activeOperand += '\b'; break;
+                            case 'r': activeOperand += '\r'; break;
+                            case 'f': activeOperand += '\f'; break;
+                            
+                            default:
+                                throw new Exception("Invalid escape sequence");
+                        }
+                        j++;
+                        break;
+
+                        default:
+                        activeOperand += exp[j];
+                        break;
+                    }
+
+                // Finally push the string operand
+                TryPushOperand();
+                i = stringEndIndex;
+                break;
+
                 case '+':
                 TryPushOperand();
                 if(lastToken != TokenType.OPERAND)
@@ -187,6 +250,17 @@ class Parser
                     > If type is int, decimal or bool - push
                     > If expression - evaluate in recursive call (.json string vars should be capable of acting as standalone expressions)
                     > If it can't be found in the variable dictionary - throw an error
+                
+                This set of rules imply the following about variable names:
+                - Cannot start with a number or a period
+                - The full range of acceptable chars in a variable name will be:
+                    - Any character: (A-Z) (a-z), underscores (_), exclamation marks (!), 
+                    - Any character except the first: numbers (0-9) periods (.) and brackets []
+                    - If a var has an opening bracket [, it must have a closing bracket ]
+                    - The contents of a bracket are a sub-expression that must resolve to an integer
+                - The full range of user-defineable chars in a variable name will be:
+                    - (A-Z) (a-z), underscores (_)
+                    - Others chars are added as a result of parsing the config file and standardizing variable names
             */
             switch(activeType)
             {

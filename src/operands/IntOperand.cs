@@ -52,8 +52,7 @@ class IntOperand : Operand
 
     public override Operand UnarySub()
     {
-        value *= -1;
-        return this;
+        return new IntOperand(value * -1);
     }
 
     public override Operand Mult(Operand b)

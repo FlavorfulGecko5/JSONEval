@@ -41,7 +41,27 @@ class Tests
         assert("-(30 * 2)+-50", "-110");
         assert("5 * 2 + - 3", "7");
 
+        // Iteration #4 Floating Point Tests
+        assert("1.5", "1.5");
+        assert("1.25 + 2.25", "3.5");
+        assert("2.50000 *2.5+ 3", "9.25");
+        assert(".25", "0.25");
+        assert("3.", "3");
+        assert("3/2.0", "1.5");
 
+        // Iteration #4 String Tests
+        assert("''", "");
+        assert("      '   '  ", "   ");
+        assert(" 'abcdefg' ", "abcdefg");
+        assert("'1 + 2 + 3'", "1 + 2 + 3");
+        assert("1 + 2 + '4'", "34");
+        assert("'4' + 3 + 2", "432");
+        assert("'  hello ' + 'everyone'", "  hello everyone");
+
+        // Iteration #4 String Escape Sequence Tests
+        assert("'`''", "'");
+        assert(@"'\n'", "\n"); // Better way to test these would be by reading lines from a file
+        assert(@"'\\hooray\\'", @"\hooray\");
         
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);

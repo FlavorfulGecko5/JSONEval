@@ -36,8 +36,7 @@ class BoolOperand : Operand
     // Unary subtraction functions as logical NOT for booleans
     public override Operand UnarySub()
     {
-        value = !value;
-        return this;
+        return new BoolOperand(!value);
     }
 
     public override Operand Mult(Operand b)
