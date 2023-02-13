@@ -17,7 +17,7 @@ class Parser
         {'*', 2000}, {'/', 2000}, {'%', 2000},
         {'+', 1000}, {'-', 1000},
 
-        {'(', -10000}, {')', -10000}
+        {'(', -10000}, {'[', -10000}
     };
 
     public VariableHandler globalVars = new VariableHandler(true);
@@ -41,7 +41,7 @@ class Parser
         TokenType lastToken = TokenType.NONE;
 
         for(int i = 0; i < exp.Length; i++)
-        {
+        {   
             char c = exp[i];
 
             if(Char.IsWhiteSpace(c))
@@ -50,10 +50,19 @@ class Parser
                 continue;
             }
 
-            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_')
             {
-                if(activeType == OperandTokenType.NONE)
+                switch(activeType)
+                {
+                    case OperandTokenType.NONE:
                     activeType = OperandTokenType.VARIABLE;
+                    break;
+
+                    case OperandTokenType.VARIABLE: break;
+
+                    default:
+                    throw new Exception("Invalid char");
+                }
                 activeOperand += c;
                 continue;
             }
@@ -68,13 +77,31 @@ class Parser
                 break;
 
                 case '.':
-                if(activeType == OperandTokenType.DECIMAL)
+                switch(activeType)
+                {
+                    case OperandTokenType.DECIMAL:
                     throw new Exception("Extra decimal");
-                else if (activeType == OperandTokenType.NONE || activeType == OperandTokenType.INTEGER)
+
+                    case OperandTokenType.NONE: case OperandTokenType.INTEGER:
                     activeType = OperandTokenType.DECIMAL;
+                    break;
+
+                    case OperandTokenType.VARIABLE: break;
+
+                    default:
+                    throw new Exception("Invalid char");
+                }
                 activeOperand += c;
                 break;
 
+                case '!':
+                if(activeType != OperandTokenType.NONE)
+                    throw new Exception("Exclamation marks may only be at the start of a variable");
+                activeType = OperandTokenType.VARIABLE;
+                activeOperand += c;
+                break;
+
+                // Reads and parses the entire string literal in one iteration of the for loop
                 case '\'':
                 if(activeType > OperandTokenType.NONE)
                     throw new Exception("Transitioning to string with active operand");
@@ -95,6 +122,8 @@ class Parser
                 for(int j = i+1; j < stringEndIndex; j++)
                     switch(exp[j])
                     {
+                        // Might want to revise escape sequence system in the future,
+                        // considering the revelation that System.Data did not have escape sequences
                         case '`':
                             if(exp[j+1] == '\'')
                             {
@@ -188,6 +217,35 @@ class Parser
                 // (A more complex solution will be needed if you want to add implicit multiplication (please don't....please))
                 lastToken = TokenType.OPERAND;
                 break;
+
+                case '[':
+                activeType = OperandTokenType.STRING;
+                TryPushOperand();
+                operators.Push(c);
+                lastToken = TokenType.OPERATOR;
+                break;
+
+                case ']':
+                TryPushOperand();
+                while(operators.Peek() != '[')
+                    eval();
+                operators.Pop();
+
+                // First thing to pop is the IntOperand (throw error if not this type)
+                // Second thing to pop is the StringOperand containing prior part of the variablename
+                // Concatenate prior name + IntOperand + ]
+                // Return activetype to variable - last token type should not matter...big question mark?
+                Operand bracketResult = operands.Pop();
+                if(!bracketResult.GetType().Equals(typeof(IntOperand)))
+                    throw new Exception("Bracket result must be an integer!");
+                StringOperand priorName = (StringOperand)operands.Pop();
+                activeOperand = priorName.value + '[' + bracketResult.ToString() + ']';
+                activeType = OperandTokenType.VARIABLE;
+                lastToken = TokenType.OPERATOR;
+                break;
+
+                default:
+                throw new Exception("Unrecognized character");
             }
             printStacks(0);
         }
@@ -259,17 +317,6 @@ class Parser
                     > If type is int, decimal or bool - push
                     > If expression - evaluate in recursive call (.json string vars should be capable of acting as standalone expressions)
                     > If it can't be found in the variable dictionary - throw an error
-                
-                This set of rules imply the following about variable names:
-                - Cannot start with a number or a period
-                - The full range of acceptable chars in a variable name will be:
-                    - Any character: (A-Z) (a-z), underscores (_), exclamation marks (!), 
-                    - Any character except the first: numbers (0-9) periods (.) and brackets []
-                    - If a var has an opening bracket [, it must have a closing bracket ]
-                    - The contents of a bracket are a sub-expression that must resolve to an integer
-                - The full range of user-defineable chars in a variable name will be:
-                    - (A-Z) (a-z), underscores (_)
-                    - Others chars are added as a result of parsing the config file and standardizing variable names
             */
             switch(activeType)
             {

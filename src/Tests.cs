@@ -77,6 +77,19 @@ class Tests
         p.globalVars.addExpressionOperand("nested", "basicexpression + firstvar");
         assert("nested", "40");
 
+        // Iteration #6 variable naming tests
+        p.globalVars.addIntOperand("_hello_there", 450);
+        assert("_hello_there", "450");
+        p.globalVars.addIntOperand("!advanced.naming.stuff", 400);
+        assert("!advanced.naming.stuff", "400");
+        p.globalVars.addIntOperand("b[0]", 234);
+        p.globalVars.addIntOperand("b[1]", 100);
+        p.globalVars.addIntOperand("b[0][0]", 5);
+        assert("b[0]", "234");
+        assert("b[10 * 10 - 100]", "234");
+        assert("b[b[1] + b[0] - 334]", "234");
+        assert("b[0][0]", "5");
+
         
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
