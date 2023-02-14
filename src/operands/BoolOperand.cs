@@ -33,10 +33,9 @@ class BoolOperand : PrimitiveOperand, VariableOperand
         throw new Exception("Cannot subtract from boolean");
     }
 
-    // Unary subtraction functions as logical NOT for booleans
     public PrimitiveOperand UnarySub()
     {
-        return new BoolOperand(!value);
+        throw new Exception("Cannot unary subtract a boolean");
     }
 
     public PrimitiveOperand Mult(PrimitiveOperand b)
@@ -52,5 +51,70 @@ class BoolOperand : PrimitiveOperand, VariableOperand
     public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         throw new Exception("Cannot take remainder of a boolean");
+    }
+
+    public PrimitiveOperand And(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case BoolOperand b3: return new BoolOperand(value & b3.value);
+            default:
+                throw new Exception("Invalid Bitwise/Logical AND operand combination");
+        }
+    }
+
+    public PrimitiveOperand Or(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case BoolOperand b3: return new BoolOperand(value | b3.value);
+            default:
+                throw new Exception("Invalid Bitwise/Logical OR operand combination");
+        }
+    }
+
+    public PrimitiveOperand Not()
+    {
+        return new BoolOperand(!value);
+    }
+
+    public PrimitiveOperand Equal(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case BoolOperand b3: return new BoolOperand(value == b3.value);
+            default:
+                throw new Exception("Invalid equality comparison");
+        }
+    }
+
+    public PrimitiveOperand NotEqual(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case BoolOperand b3: return new BoolOperand(value != b3.value);
+            default:
+                throw new Exception("Invalid not-equals comparison");
+        }
+    }
+
+    public PrimitiveOperand LessThan(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Less-Than operand combination");
+    }
+
+    public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Less-Than-Equal operand combination");
+    }
+
+    public PrimitiveOperand GreaterThan(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Less-Than operand combination");
+    }
+
+    public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Greater-Than-Equal operand combination");
     }
 }

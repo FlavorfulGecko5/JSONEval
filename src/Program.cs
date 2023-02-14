@@ -10,12 +10,19 @@ class Parser
 {
     const char SYM_UNARY_ADDITION = 'a';
     const char SYM_UNARY_SUBTRACTION = 's';
+    const char SYM_NOT_EQUAL = 'e';
+    const char SYM_LESS_THAN_EQUAL = 'l';
+    const char SYM_GREATER_THAN_EQUAL = 'g';
     const int PRECEDENCE_UNARY = 5000;
     static readonly Dictionary<char, int> precedence = new Dictionary<char, int>()
     {
-        {SYM_UNARY_ADDITION, PRECEDENCE_UNARY}, {SYM_UNARY_SUBTRACTION, PRECEDENCE_UNARY},
+        {'~', PRECEDENCE_UNARY}, {SYM_UNARY_ADDITION, PRECEDENCE_UNARY}, {SYM_UNARY_SUBTRACTION, PRECEDENCE_UNARY},
         {'*', 2000}, {'/', 2000}, {'%', 2000},
         {'+', 1000}, {'-', 1000},
+        {'<', 700}, {'>', 700}, {SYM_LESS_THAN_EQUAL, 700}, {SYM_GREATER_THAN_EQUAL, 700},
+        {'=', 500}, {SYM_NOT_EQUAL, 500},
+        {'&', 400},
+        {'|', 300},
 
         {'(', -10000}, {'[', -10000}
     };
@@ -33,9 +40,6 @@ class Parser
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
         string exp = expWrapper.value;
-
-        // This method is correct - check by last token type, not by last
-        // thing pushed to a stack
         string activeOperand = "";
         OperandTokenType activeType = OperandTokenType.NONE;
         TokenType lastToken = TokenType.NONE;
@@ -171,18 +175,36 @@ class Parser
                     c = SYM_UNARY_SUBTRACTION;
                 goto LABEL_EVAL;
 
-                case '*': 
+                case '~':
                 TryPushOperand();
+                if(exp[i+1] == '=')
+                {
+                    c = SYM_NOT_EQUAL;
+                    i++;
+                }
                 goto LABEL_EVAL;
 
-                case '/': 
-                TryPushOperand();
+                case '<':            // Since these are operators
+                TryPushOperand();    // Out-of-bounds index implies
+                if(exp[i+1] == '=')  // bad expression syntax
+                {
+                    c = SYM_LESS_THAN_EQUAL;
+                    i++;
+                }
                 goto LABEL_EVAL;
 
-                case '%':
+                case '>':
                 TryPushOperand();
+                if(exp[i+1] == '=')
+                {
+                    c = SYM_GREATER_THAN_EQUAL;
+                    i++;
+                }
                 goto LABEL_EVAL;
 
+                case '*': case '/': case '%': 
+                case '=': case '&': case '|': 
+                TryPushOperand();
                 LABEL_EVAL:
                 while(operators.Count > 0)
                 {
@@ -267,6 +289,10 @@ class Parser
             {
                 switch(op)
                 {
+                    case '~':
+                        operands.Push(rightHand.Not());
+                    break;
+
                     case SYM_UNARY_ADDITION:
                         operands.Push(rightHand.UnaryAdd());
                     break;
@@ -299,6 +325,38 @@ class Parser
 
                 case '-':
                     operands.Push(leftHand.Sub(rightHand));
+                break;
+
+                case '=':
+                    operands.Push(leftHand.Equal(rightHand));
+                break;
+
+                case SYM_NOT_EQUAL:
+                    operands.Push(leftHand.NotEqual(rightHand));
+                break;
+
+                case '&':
+                    operands.Push(leftHand.And(rightHand));
+                break;
+
+                case '|':
+                    operands.Push(leftHand.Or(rightHand));
+                break;
+
+                case '<':
+                    operands.Push(leftHand.LessThan(rightHand));
+                break;
+
+                case SYM_LESS_THAN_EQUAL:
+                    operands.Push(leftHand.LessThanEqual(rightHand));
+                break;
+
+                case '>':
+                    operands.Push(leftHand.GreaterThan(rightHand));
+                break;
+
+                case SYM_GREATER_THAN_EQUAL:
+                    operands.Push(leftHand.GreaterThanEqual(rightHand));
                 break;
             }
         }

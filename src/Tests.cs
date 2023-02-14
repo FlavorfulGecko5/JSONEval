@@ -85,11 +85,45 @@ class Tests
         p.globalVars.addIntOperand("b[0]", 234);
         p.globalVars.addIntOperand("b[1]", 100);
         p.globalVars.addIntOperand("b[0][0]", 5);
+        p.globalVars.addIntOperand("b[100]", -1);
         assert("b[0]", "234");
         assert("b[10 * 10 - 100]", "234");
         assert("b[b[1] + b[0] - 334]", "234");
         assert("b[0][0]", "5");
+        assert("b[100]", "-1");
 
+        // Iteration #7 Logical operation tests
+        assert("3 & 6 ", "2");
+        assert("true & true", "True");
+        assert("false & true", "False");
+        assert ("false & false", "False");
+        assert("7 | 8", "15");
+        assert("true | true", "True");
+        assert("true | false", "True");
+        assert("false | false", "False");
+        assert("~ - 1", "0");
+        assert("~true", "False");
+        assert("~False", "True");
+        assert("5 = 5", "True");
+        assert(" 4 = 5", "False");
+        assert("2.5 = 2.5", "True");
+        assert("true = FALSE", "False");
+        assert("'string' = 'string'", "True");
+        assert(" 4 ~= 5", "True");
+        assert(" 5 ~= 5", "False");
+        assert("2.5 ~= 56", "True");
+        assert("2.0 ~= 2", "False");
+        assert("True ~= True", "False");
+        assert("'abc' ~= 'abcc'", "True");
+        assert("1 < 2", "True");
+        assert("1.0 < 2", "True");
+        assert("1 < 1", "False");
+        assert("1 <= 1", "True");
+        assert("1 >= 1", "True");
+        assert("1 > 1", "False");
+        assert("250.0 <= 250", "True");
+        assert("true & (4 <= 5)", "True");
+        assert("~true | ~(5 + 7 > 11)", "False");
         
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);

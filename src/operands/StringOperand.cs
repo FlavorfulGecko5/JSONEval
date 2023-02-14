@@ -59,4 +59,59 @@ class StringOperand : PrimitiveOperand
     {
         throw new Exception("Cannot take the remainder of a string");
     }
+
+    public PrimitiveOperand And(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Bitwise/Logical AND operand combination");
+    }
+
+    public PrimitiveOperand Or(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Bitwise/Logical OR operand combination");
+    }
+
+    public PrimitiveOperand Not()
+    {
+        throw new Exception("Cannot perform bitwise/logical not on a string");
+    }
+
+    public PrimitiveOperand Equal(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case StringOperand b4: return new BoolOperand(value.Equals(b4.value));
+            default:
+                throw new Exception("Invalid equality comparison");
+        }
+    }
+
+    public PrimitiveOperand NotEqual(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case StringOperand b4: return new BoolOperand(!value.Equals(b4.value));
+            default:
+                throw new Exception("Invalid not-equals comparison");
+        }
+    }
+
+    public PrimitiveOperand LessThan(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Less-Than operand combination");
+    }
+
+    public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Less-Than-Equal operand combination");
+    }
+
+    public PrimitiveOperand GreaterThan(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Less-Than operand combination");
+    }
+
+    public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Greater-Than-Equal operand combination");
+    }
 }

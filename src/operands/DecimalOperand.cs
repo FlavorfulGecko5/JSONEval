@@ -93,4 +93,85 @@ class DecimalOperand : PrimitiveOperand, VariableOperand
                 throw new Exception("Cannot subtract this type from a decimal");
         }
     }
+
+    public PrimitiveOperand And(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Bitwise/Logical AND operand combination");
+    }
+
+    public PrimitiveOperand Or(PrimitiveOperand b)
+    {
+        throw new Exception("Invalid Bitwise/Logical OR operand combination");
+    }
+
+    public PrimitiveOperand Not()
+    {
+        throw new Exception("Cannot perform bitwise/logical not on a Floating-Point Number");
+    }
+
+    public PrimitiveOperand Equal(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case IntOperand b1: return new BoolOperand(value == b1.value);
+            case DecimalOperand b2: return new BoolOperand(value == b2.value);
+            default:
+                throw new Exception("Invalid equality comparison");
+        }
+    }
+
+    public PrimitiveOperand NotEqual(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case IntOperand b1: return new BoolOperand(value != b1.value);
+            case DecimalOperand b2: return new BoolOperand(value != b2.value);
+            default:
+                throw new Exception("Invalid not-equals comparison");
+        }
+    }
+
+    public PrimitiveOperand LessThan(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case IntOperand b1: return new BoolOperand(value < b1.value);
+            case DecimalOperand b2: return new BoolOperand(value < b2.value);
+            default:
+                throw new Exception("Invalid Less-Than operand combination");
+        }
+    }
+
+    public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case IntOperand b1: return new BoolOperand(value <= b1.value);
+            case DecimalOperand b2: return new BoolOperand(value <= b2.value);
+            default:
+                throw new Exception("Invalid Less-Than-Equal operand combination");
+        }
+    }
+
+    public PrimitiveOperand GreaterThan(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case IntOperand b1: return new BoolOperand(value > b1.value);
+            case DecimalOperand b2: return new BoolOperand(value > b2.value);
+            default:
+                throw new Exception("Invalid Greater-Than operand combination");
+        }
+    }
+
+    public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
+    {
+        switch (b)
+        {
+            case IntOperand b1: return new BoolOperand(value >= b1.value);
+            case DecimalOperand b2: return new BoolOperand(value >= b2.value);
+            default:
+                throw new Exception("Invalid Greater-Than-Equal operand combination");
+        }
+    }
 }
