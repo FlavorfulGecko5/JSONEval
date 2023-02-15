@@ -1,4 +1,4 @@
-class DecimalOperand : PrimitiveOperand, VariableOperand
+class DecimalOperand : PrimitiveOperand
 {
     public double value { get; private set; }
 

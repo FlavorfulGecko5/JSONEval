@@ -1,7 +1,5 @@
 interface Operand {}
 
-interface VariableOperand : Operand {}
-
 interface PrimitiveOperand : Operand
 {
     public PrimitiveOperand Add(PrimitiveOperand b);

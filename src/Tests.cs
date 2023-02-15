@@ -65,27 +65,27 @@ class Tests
         
 
         // Iteration #5 basic variable tests
-        p.globalVars.addIntOperand("firstvar", 34);
+        Parser.globalVars.addIntOperand("firstvar", 34);
         assert("firstvar", "34");
         assert("FIRSTVAR + 500", "534");
-        p.globalVars.addExpressionOperand("basicexpression", "1 + 2 + 3");
+        Parser.globalVars.addExpressionOperand("basicexpression", "1 + 2 + 3");
         assert("basicexpression", "6");
         assert("true", "True");
         assert("FALSE", "False");
         assert("true + ' big victory'", "True big victory");
         assert("firstvar * basicexpression", "204");
-        p.globalVars.addExpressionOperand("nested", "basicexpression + firstvar");
+        Parser.globalVars.addExpressionOperand("nested", "basicexpression + firstvar");
         assert("nested", "40");
 
         // Iteration #6 variable naming tests
-        p.globalVars.addIntOperand("_hello_there", 450);
+        Parser.globalVars.addIntOperand("_hello_there", 450);
         assert("_hello_there", "450");
-        p.globalVars.addIntOperand("!advanced.naming.stuff", 400);
+        Parser.globalVars.addIntOperand("!advanced.naming.stuff", 400);
         assert("!advanced.naming.stuff", "400");
-        p.globalVars.addIntOperand("b[0]", 234);
-        p.globalVars.addIntOperand("b[1]", 100);
-        p.globalVars.addIntOperand("b[0][0]", 5);
-        p.globalVars.addIntOperand("b[100]", -1);
+        Parser.globalVars.addIntOperand("b[0]", 234);
+        Parser.globalVars.addIntOperand("b[1]", 100);
+        Parser.globalVars.addIntOperand("b[0][0]", 5);
+        Parser.globalVars.addIntOperand("b[100]", -1);
         assert("b[0]", "234");
         assert("b[10 * 10 - 100]", "234");
         assert("b[b[1] + b[0] - 334]", "234");
@@ -124,6 +124,16 @@ class Tests
         assert("250.0 <= 250", "True");
         assert("true & (4 <= 5)", "True");
         assert("~true | ~(5 + 7 > 11)", "False");
+
+        // Iteration #8 UserFunction with Primitive Parameter tests
+        Parser.functions.Add("funcA", new UserFunction("!0 + !1 + !2", FxParamType.PRIMITIVE, FxParamType.PRIMITIVE, FxParamType.PRIMITIVE));
+        Parser.functions.Add("delimtest", new UserFunction("!0", FxParamType.PRIMITIVE));
+        assert("funcA(   1 , 2  , 3 )", "6");
+        assert("funcA(  'hello('  , 'door', '')"  , "hello(door");
+        assert("DELIMTEST( ',()(`',,(`'`'),()(,,())' )", ",()(',,(''),()(,,())");
+        assert("delimtest(1)+ 3", "4");
+        assert("delimtest(delimtest('(boo)'))", "(boo)");
+        assert("delimtest((~true))", "False");
         
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);

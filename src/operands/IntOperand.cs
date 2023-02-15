@@ -1,4 +1,4 @@
-class IntOperand : PrimitiveOperand, VariableOperand
+class IntOperand : PrimitiveOperand
 {
     public int value { get; private set; }
 

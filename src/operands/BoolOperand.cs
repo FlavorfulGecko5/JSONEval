@@ -1,4 +1,4 @@
-class BoolOperand : PrimitiveOperand, VariableOperand
+class BoolOperand : PrimitiveOperand
 {
     public bool value { get; private set; }
 

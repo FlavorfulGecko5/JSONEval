@@ -27,18 +27,29 @@ class Parser
         {'(', -10000}, {'[', -10000}
     };
 
-    public VariableHandler globalVars = new VariableHandler(true);
+    public static VariableHandler globalVars;
+    public static FunctionHandler functions;
+
+    static Parser()
+    {
+        globalVars = new VariableHandler();
+        globalVars.addBoolOperand("true", true);
+        globalVars.addBoolOperand("false", false);
+
+        functions = new FunctionHandler();
+    }
 
     public string evaluate(string exp)
     {
-        PrimitiveOperand result = evaluate(new ExpressionOperand(exp), new VariableHandler(false));
+        PrimitiveOperand result = evaluate(new ExpressionOperand(exp));
         return result.ToString() ?? "How can this possibly return null?";
     }
 
-    private PrimitiveOperand evaluate(ExpressionOperand expWrapper, VariableHandler localVars)
+    private PrimitiveOperand evaluate(ExpressionOperand expWrapper)
     {
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
+        VariableHandler localVars = expWrapper.localVars;
         string exp = expWrapper.value;
         string activeOperand = "";
         OperandTokenType activeType = OperandTokenType.NONE;
@@ -221,11 +232,13 @@ class Parser
                 break;
 
                 case '(':
-                // Considerations for Try-Push
-                // With strict arithmetic rules - an operand into a parenthesis is a syntax error
-                // Alternatively, could implicitly add a multiplication operator
-                operators.Push(c);
-                lastToken = TokenType.OPERATOR; 
+                if(activeType == OperandTokenType.VARIABLE) // Function call where activeOperand is the function name
+                    i = functionHandler(i);                 // i becomes close parentheses index
+                else
+                {
+                    operators.Push(c);
+                    lastToken = TokenType.OPERATOR;
+                }
                 break;
 
                 case ')':
@@ -403,16 +416,16 @@ class Parser
                     if(!isGlobal && !isLocal)
                         throw new Exception("Could not find variable '" + activeOperand + "'");
                     
-                    VariableOperand varValue = isGlobal ? globalVars[activeOperand] : localVars[activeOperand];
+                    Operand varValue = isGlobal ? globalVars[activeOperand] : localVars[activeOperand];
 
                     switch(varValue)
                     {
-                        case IntOperand: case DecimalOperand: case BoolOperand:
+                        case IntOperand: case DecimalOperand: case BoolOperand: case StringOperand:
                         operands.Push((PrimitiveOperand)varValue);
                         break;
 
                         case ExpressionOperand v1:
-                        operands.Push(evaluate(v1, new VariableHandler(false)));
+                        operands.Push(evaluate(v1));
                         break;
                     }
                 break;
@@ -422,6 +435,118 @@ class Parser
             activeOperand = "";
             lastToken = TokenType.OPERAND;
             activeType = OperandTokenType.NONE;
+        }
+
+        int functionHandler(int openIndex)
+        {
+            if(!functions.ContainsKey(activeOperand))
+                throw new Exception("Function name not recognized");
+
+            // STEP 1: EXTRACT THE RAW PARAMETERS
+            // Track parentheses/non-escaped string chars to ensure we locate the right commas
+            FxParamType[] parmData = functions[activeOperand].paramInfo;
+            string[] rawParms = new string[parmData.Length];
+            int closeIndex = openIndex + 1; // Gets iterated on until the close parentheses is reached
+
+            for(int i = 0; i < rawParms.Length; i++)
+            {
+                int paramStartIndex = closeIndex;
+                char delimiter = i == rawParms.Length - 1 ? ')' : ',';
+                bool foundParamEndIndex = false;
+                Stack<char> extraDelimiters = new Stack<char>();
+                while(!foundParamEndIndex && closeIndex < exp.Length)
+                {
+                    switch(exp[closeIndex])
+                    {
+                        case '(':
+                        if(extraDelimiters.Count > 0)
+                        {
+                            if(extraDelimiters.Peek() != '\'')
+                                extraDelimiters.Push('(');
+                        }
+                        else extraDelimiters.Push('(');
+                        break;
+
+                        case ')':
+                        if(extraDelimiters.Count > 0)
+                        {
+                            if(extraDelimiters.Peek() == '(')
+                                extraDelimiters.Pop();
+                        }
+                        else if(delimiter == ')') // Once found, closeIndex will be delimiter index + 1
+                            foundParamEndIndex = true;
+                        else
+                            throw new Exception("Too few arguments received for function call"); 
+                        break;
+
+                        case '\'':
+                        if(extraDelimiters.Count > 0)
+                        {
+                            switch(extraDelimiters.Peek())
+                            {
+                                case '(':
+                                extraDelimiters.Push('\'');
+                                break;
+
+                                case '\'':
+                                if(exp[closeIndex - 1] != '`') // Accounts for escape sequence
+                                    extraDelimiters.Pop();
+                                break;
+                            }
+                        }
+                        else extraDelimiters.Push('\'');
+                        break;
+
+                        case ',':
+                        if(extraDelimiters.Count == 0)
+                        {
+                            if(delimiter == ',')
+                                foundParamEndIndex = true;
+                            else
+                                throw new Exception("Too many arguments received for function call");
+                        }
+                        break;
+                    }
+                    closeIndex++;
+                }
+                if(!foundParamEndIndex)
+                    throw new Exception("Failed to find parameter #" + (i+1) + " for function call.");
+                rawParms[i] = exp.Substring(paramStartIndex, closeIndex - paramStartIndex - 1);
+            }
+            closeIndex--; // Fixup the final index to match the close parentheses
+
+            // STEP 2: BUILD LOCAL CALL PARMS
+            VariableHandler callVariables = new VariableHandler();
+
+            for(int i = 0; i < rawParms.Length; i++)
+            {
+                switch(parmData[i])
+                {
+                    case FxParamType.PRIMITIVE:
+                        ExpressionOperand toPrim = new ExpressionOperand(rawParms[i], localVars);
+                        callVariables.Add("!" + i, evaluate(toPrim));
+                    break;
+
+                    case FxParamType.EXPRESSION: case FxParamType.REFERENCE:
+                    throw new Exception("Not implemented");
+                }
+            }
+
+            // STEP 3: EXECUTE THE FUNCTION CALL
+            switch(functions[activeOperand])
+            {
+                case UserFunction f1:
+                    ExpressionOperand toPrim = new ExpressionOperand(f1.expression, callVariables);
+                    operands.Push(evaluate(toPrim));
+                break;
+
+                case CodedFunction f2:
+                throw new Exception("Not implemented");
+            }
+            activeOperand = "";
+            activeType = OperandTokenType.NONE;
+            lastToken = TokenType.OPERAND;
+            return closeIndex;
         }
 
         void printStacks(int printIfOne)

@@ -13,16 +13,9 @@ Symbols:
 - Commas , - parameter delimiters
 */
 
-class VariableHandler : Dictionary<string, VariableOperand>
+class VariableHandler : Dictionary<string, Operand>
 {
-    public VariableHandler(bool isGlobalHandler) : base(StringComparer.OrdinalIgnoreCase) 
-    {
-        if(isGlobalHandler)
-        {
-            addBoolOperand("true", true);
-            addBoolOperand("false", false);
-        }
-    }
+    public VariableHandler() : base(StringComparer.OrdinalIgnoreCase) {}
 
     public void addIntOperand(string name, int value)
     {
@@ -54,5 +47,13 @@ class VariableHandler : Dictionary<string, VariableOperand>
             throw new Exception("Duplicate variable");
 
         Add(name, new ExpressionOperand(value));
+    }
+
+    public void addExpressionOperand(string name, string value, VariableHandler localVars)
+    {
+        if (ContainsKey(name))
+            throw new Exception("Duplicate variable");
+        
+        Add(name, new ExpressionOperand(value, localVars));
     }
 }
