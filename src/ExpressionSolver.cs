@@ -1,12 +1,4 @@
-﻿class MainProgram
-{
-    public static void Main(string[] args)
-    {
-        Tests.RunUnitTests();
-    }
-}
-
-class Parser
+﻿class ExpressionSolver
 {
     const char SYM_UNARY_ADDITION = 'a';
     const char SYM_UNARY_SUBTRACTION = 's';
@@ -30,7 +22,7 @@ class Parser
     public static VariableHandler globalVars;
     public static FunctionHandler functions;
 
-    static Parser()
+    static ExpressionSolver()
     {
         globalVars = new VariableHandler();
         globalVars.addBoolOperand("true", true);
