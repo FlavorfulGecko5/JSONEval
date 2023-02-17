@@ -37,6 +37,10 @@ class Parser
         globalVars.addBoolOperand("false", false);
 
         functions = new FunctionHandler();
+        functions.Add("if", new CodedFunction_IfElse());
+        functions.Add("and", new CodedFunction_And());
+        functions.Add("or", new CodedFunction_Or());
+        functions.Add("int", new CodedFunction_IntCast());
     }
 
     public string evaluate(string exp)
@@ -45,7 +49,7 @@ class Parser
         return result.ToString() ?? "How can this possibly return null?";
     }
 
-    private PrimitiveOperand evaluate(ExpressionOperand expWrapper)
+    public PrimitiveOperand evaluate(ExpressionOperand expWrapper)
     {
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
@@ -527,7 +531,11 @@ class Parser
                         callVariables.Add("!" + i, evaluate(toPrim));
                     break;
 
-                    case FxParamType.EXPRESSION: case FxParamType.REFERENCE:
+                    case FxParamType.EXPRESSION:
+                        callVariables.addExpressionOperand("!" + i, rawParms[i], localVars);
+                    break;
+
+                    case FxParamType.REFERENCE:
                     throw new Exception("Not implemented");
                 }
             }
@@ -541,7 +549,8 @@ class Parser
                 break;
 
                 case CodedFunction f2:
-                throw new Exception("Not implemented");
+                    operands.Push(f2.eval(this, callVariables));
+                break;
             }
             activeOperand = "";
             activeType = OperandTokenType.NONE;

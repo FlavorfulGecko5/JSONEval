@@ -134,6 +134,22 @@ class Tests
         assert("delimtest(1)+ 3", "4");
         assert("delimtest(delimtest('(boo)'))", "(boo)");
         assert("delimtest((~true))", "False");
+
+        // Iteration #9 Coded Functions and Expression Parameter tests
+        assert("if(true, 5, 1 / 0)", "5");
+        assert("if(true & false, 1 / 0, 4)", "4");
+        assert("and(true, true)", "True");
+        assert("and(true, false)", "False");
+        assert("and(false, true)", "False");
+        assert("AND(false, false)", "False");
+        assert("OR(true, true)", "True");
+        assert("OR(true, false)", "True");
+        assert("OR(false, true)", "True");
+        assert("OR(false, false)", "False");
+        assert("int(1.5)", "1");
+        assert("int(-1.5)", "-1");
+        assert("int(true)", "1");
+        assert("int(false)", "0");
         
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
