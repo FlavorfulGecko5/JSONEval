@@ -49,10 +49,10 @@ class CodedFunction_And : CodedFunction
             {
                 PrimitiveOperand rightResult = p.evaluate((ExpressionOperand)parms["!1"]);
                 if(((BoolOperand)rightResult).value)
-                    return new BoolOperand(true);
-                return new BoolOperand(false);
+                    return BoolOperand.TRUE;
+                return BoolOperand.FALSE;
             }
-            else return new BoolOperand(false);
+            else return BoolOperand.FALSE;
         }
         catch(System.InvalidCastException)
         {
@@ -74,13 +74,13 @@ class CodedFunction_Or : CodedFunction
         {
             PrimitiveOperand leftResult = p.evaluate((ExpressionOperand)parms["!0"]);
             if (((BoolOperand)leftResult).value)
-                return new BoolOperand(true);
+                return BoolOperand.TRUE;
 
             PrimitiveOperand rightResult = p.evaluate((ExpressionOperand)parms["!1"]);
             if (((BoolOperand)rightResult).value)
-                return new BoolOperand(true);
+                return BoolOperand.TRUE;
             
-            return new BoolOperand(false);
+            return BoolOperand.FALSE;
         }
         catch (System.InvalidCastException)
         {

@@ -1,11 +1,18 @@
 class BoolOperand : PrimitiveOperand
 {
+    public static readonly BoolOperand TRUE = new BoolOperand(){value = true};
+    public static readonly BoolOperand FALSE = new BoolOperand(){value = false};
+
+    public static BoolOperand ToOperand(bool b)
+    {
+        if(b) return TRUE;
+        else return FALSE;
+    }
+
     public bool value { get; private set; }
 
-    public BoolOperand(bool vParam)
-    {
-        value = vParam;
-    }
+    // Use ToOperand() to get the appropriate BoolOperand for a boolean value
+    private BoolOperand(){}
 
     public override string ToString()
     {
@@ -57,7 +64,7 @@ class BoolOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case BoolOperand b3: return new BoolOperand(value & b3.value);
+            case BoolOperand b3: return ToOperand(value & b3.value);
             default:
                 throw new Exception("Invalid Bitwise/Logical AND operand combination");
         }
@@ -67,7 +74,7 @@ class BoolOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case BoolOperand b3: return new BoolOperand(value | b3.value);
+            case BoolOperand b3: return ToOperand(value | b3.value);
             default:
                 throw new Exception("Invalid Bitwise/Logical OR operand combination");
         }
@@ -75,14 +82,14 @@ class BoolOperand : PrimitiveOperand
 
     public PrimitiveOperand Not()
     {
-        return new BoolOperand(!value);
+        return ToOperand(!value);
     }
 
     public PrimitiveOperand Equal(PrimitiveOperand b)
     {
         switch (b)
         {
-            case BoolOperand b3: return new BoolOperand(value == b3.value);
+            case BoolOperand b3: return ToOperand(value == b3.value);
             default:
                 throw new Exception("Invalid equality comparison");
         }
@@ -92,7 +99,7 @@ class BoolOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case BoolOperand b3: return new BoolOperand(value != b3.value);
+            case BoolOperand b3: return ToOperand(value != b3.value);
             default:
                 throw new Exception("Invalid not-equals comparison");
         }

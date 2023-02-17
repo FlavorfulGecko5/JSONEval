@@ -79,7 +79,7 @@ class StringOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case StringOperand b4: return new BoolOperand(value.Equals(b4.value));
+            case StringOperand b4: return BoolOperand.ToOperand(value.Equals(b4.value));
             default:
                 throw new Exception("Invalid equality comparison");
         }
@@ -89,7 +89,7 @@ class StringOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case StringOperand b4: return new BoolOperand(!value.Equals(b4.value));
+            case StringOperand b4: return BoolOperand.ToOperand(!value.Equals(b4.value));
             default:
                 throw new Exception("Invalid not-equals comparison");
         }

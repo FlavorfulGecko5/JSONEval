@@ -123,8 +123,8 @@ class IntOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case IntOperand b1: return new BoolOperand(value == b1.value);
-            case DecimalOperand b2: return new BoolOperand(value == b2.value);
+            case IntOperand b1: return BoolOperand.ToOperand(value == b1.value);
+            case DecimalOperand b2: return BoolOperand.ToOperand(value == b2.value);
             default:
                 throw new Exception("Invalid equality comparison");
         }
@@ -134,8 +134,8 @@ class IntOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case IntOperand b1: return new BoolOperand(value != b1.value);
-            case DecimalOperand b2: return new BoolOperand(value != b2.value);
+            case IntOperand b1: return BoolOperand.ToOperand(value != b1.value);
+            case DecimalOperand b2: return BoolOperand.ToOperand(value != b2.value); 
             default:
                 throw new Exception("Invalid not-equals comparison");
         }
@@ -145,8 +145,8 @@ class IntOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case IntOperand b1: return new BoolOperand(value < b1.value);
-            case DecimalOperand b2: return new BoolOperand(value < b2.value);
+            case IntOperand b1: return BoolOperand.ToOperand(value < b1.value);
+            case DecimalOperand b2: return BoolOperand.ToOperand(value < b2.value);
             default:
                 throw new Exception("Invalid Less-Than operand combination");
         }
@@ -156,8 +156,8 @@ class IntOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case IntOperand b1: return new BoolOperand(value <= b1.value);
-            case DecimalOperand b2: return new BoolOperand(value <= b2.value);
+            case IntOperand b1: return BoolOperand.ToOperand(value <= b1.value);
+            case DecimalOperand b2: return BoolOperand.ToOperand(value <= b2.value);
             default:
                 throw new Exception("Invalid Less-Than-Equal operand combination");
         }
@@ -167,8 +167,8 @@ class IntOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case IntOperand b1: return new BoolOperand(value > b1.value);
-            case DecimalOperand b2: return new BoolOperand(value > b2.value);
+            case IntOperand b1: return BoolOperand.ToOperand(value > b1.value);
+            case DecimalOperand b2: return BoolOperand.ToOperand(value > b2.value);
             default:
                 throw new Exception("Invalid Greater-Than operand combination");
         }
@@ -178,8 +178,8 @@ class IntOperand : PrimitiveOperand
     {
         switch (b)
         {
-            case IntOperand b1: return new BoolOperand(value >= b1.value);
-            case DecimalOperand b2: return new BoolOperand(value >= b2.value);
+            case IntOperand b1: return BoolOperand.ToOperand(value >= b1.value);
+            case DecimalOperand b2: return BoolOperand.ToOperand(value >= b2.value);
             default:
                 throw new Exception("Invalid Greater-Than-Equal operand combination");
         }

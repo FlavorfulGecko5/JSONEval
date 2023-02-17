@@ -38,7 +38,7 @@ class VariableHandler : Dictionary<string, Operand>
         if (ContainsKey(name))
             throw new Exception("Duplicate variable");
 
-        Add(name, new BoolOperand(value));
+        Add(name, BoolOperand.ToOperand(value));
     }
 
     public void addExpressionOperand(string name, string value)

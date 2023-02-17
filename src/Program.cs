@@ -424,12 +424,12 @@ class Parser
 
                     switch(varValue)
                     {
-                        case IntOperand: case DecimalOperand: case BoolOperand: case StringOperand:
-                        operands.Push((PrimitiveOperand)varValue);
+                        case PrimitiveOperand v1:
+                        operands.Push(v1);
                         break;
 
-                        case ExpressionOperand v1:
-                        operands.Push(evaluate(v1));
+                        case ExpressionOperand v2:
+                        operands.Push(evaluate(v2));
                         break;
                     }
                 break;
