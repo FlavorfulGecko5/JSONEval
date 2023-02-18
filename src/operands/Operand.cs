@@ -2,6 +2,8 @@ interface Operand {}
 
 interface PrimitiveOperand : Operand
 {
+    public string ToString();
+
     public PrimitiveOperand Add(PrimitiveOperand b);
 
     public PrimitiveOperand UnaryAdd();

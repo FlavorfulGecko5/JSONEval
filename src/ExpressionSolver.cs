@@ -1,5 +1,11 @@
 ﻿class ExpressionSolver
 {
+    /*
+    * Operators are internally represented using single characters.
+    * Those operators composed of multiple characters or those with multiple
+    * meanings (unary addition/subtraction) have other characters assigned
+    * for their internal representation.
+    */
     const char SYM_UNARY_ADDITION = 'a';
     const char SYM_UNARY_SUBTRACTION = 's';
     const char SYM_NOT_EQUAL = 'e';
@@ -19,9 +25,20 @@
         {'(', -10000}, {'[', -10000}
     };
 
+    /// <summary>
+    /// All expressions can use the variables stored here
+    /// </summary>
     public static VariableHandler globalVars;
+
+    /// <summary>
+    /// Info for all available functions (user-defined and hard-coded)
+    /// </summary>
     public static FunctionHandler functions;
 
+    /// <summary>
+    /// Use this to load any standard variables and functions
+    /// into their respective dictionaries
+    /// </summary>
     static ExpressionSolver()
     {
         globalVars = new VariableHandler();
@@ -35,25 +52,33 @@
         functions.Add("int", new CodedFunction_IntCast());
     }
 
+    /// <summary>
+    /// Fully evaluates a string expression
+    /// </summary>
+    /// <param name="exp">The expression to evaluate</param>
+    /// <returns>The string representation of the result</returns>
     public string evaluate(string exp)
     {
         PrimitiveOperand result = evaluate(new ExpressionOperand(exp));
-        return result.ToString() ?? "How can this possibly return null?";
+        return result.ToString();
     }
 
-    public PrimitiveOperand evaluate(ExpressionOperand expWrapper)
+    /// <summary>
+    /// Fully evaluates an expression
+    /// </summary>
+    /// <param name="exp">The expression to evaluate</param>
+    /// <returns>The result stored in an appropriate operand object</returns>
+    public PrimitiveOperand evaluate(ExpressionOperand exp)
     {
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
-        VariableHandler localVars = expWrapper.localVars;
-        string exp = expWrapper.value;
         string activeOperand = "";
         OperandTokenType activeType = OperandTokenType.NONE;
         TokenType lastToken = TokenType.NONE;
 
-        for(int i = 0; i < exp.Length; i++)
+        for(int i = 0; i < exp.value.Length; i++)
         {   
-            char c = exp[i];
+            char c = exp.value[i];
 
             if(Char.IsWhiteSpace(c))
             {
@@ -119,8 +144,8 @@
                 activeType = OperandTokenType.STRING;
 
                 int stringEndIndex = -1;
-                for(int j = i+1; j < exp.Length; j++)
-                    if(exp[j] == '\'' && exp[j-1] != '`')
+                for(int j = i+1; j < exp.value.Length; j++)
+                    if(exp.value[j] == '\'' && exp.value[j-1] != '`')
                     {
                         stringEndIndex = j;
                         break;
@@ -131,12 +156,12 @@
                 // At this point we know the start and end index of the string,
                 // and that the index before the end quote does not have a `
                 for(int j = i+1; j < stringEndIndex; j++)
-                    switch(exp[j])
+                    switch(exp.value[j])
                     {
                         // Might want to revise escape sequence system in the future,
                         // considering the revelation that System.Data did not have escape sequences
                         case '`':
-                            if(exp[j+1] == '\'')
+                            if(exp.value[j+1] == '\'')
                             {
                                 activeOperand += '\'';
                                 j++;
@@ -144,7 +169,7 @@
                         break;
 
                         case '\\':
-                        switch(exp[j+1]) // This can include the end quote if before it
+                        switch(exp.value[j+1]) // This can include the end quote if before it
                         {
                             // All JSON-supported escape sequences
                             case '\\': activeOperand += '\\'; break;
@@ -161,7 +186,7 @@
                         break;
 
                         default:
-                        activeOperand += exp[j];
+                        activeOperand += exp.value[j];
                         break;
                     }
 
@@ -184,7 +209,7 @@
 
                 case '~':
                 TryPushOperand();
-                if(exp[i+1] == '=')
+                if(exp.value[i+1] == '=')
                 {
                     c = SYM_NOT_EQUAL;
                     i++;
@@ -193,7 +218,7 @@
 
                 case '<':            // Since these are operators
                 TryPushOperand();    // Out-of-bounds index implies
-                if(exp[i+1] == '=')  // bad expression syntax
+                if(exp.value[i+1] == '=')  // bad expression syntax
                 {
                     c = SYM_LESS_THAN_EQUAL;
                     i++;
@@ -202,7 +227,7 @@
 
                 case '>':
                 TryPushOperand();
-                if(exp[i+1] == '=')
+                if(exp.value[i+1] == '=')
                 {
                     c = SYM_GREATER_THAN_EQUAL;
                     i++;
@@ -241,18 +266,14 @@
                 TryPushOperand();
                 while(operators.Peek() != '(')
                     eval();
-                operators.Pop();
-                // A close parenthesis means a sub-expression has been forcibly resolved
-                // to an operand - hence, say it's an operand so unary operators function
-                // Think harder to make sure this is a good idea or if it's better to make a new enum value for these niche cases
-                // (A more complex solution will be needed if you want to add implicit multiplication (please don't....please))
-                lastToken = TokenType.OPERAND;
+                operators.Pop();               // At this point, the contents of the parentheses
+                lastToken = TokenType.OPERAND; // Have been resolved to a single operand
                 break;
 
                 case '[':
                 activeType = OperandTokenType.STRING;
-                TryPushOperand();
-                operators.Push(c);
+                TryPushOperand();  // The current name will be popped from
+                operators.Push(c); // the stack are resolving the bracket contents
                 lastToken = TokenType.OPERATOR;
                 break;
 
@@ -261,18 +282,18 @@
                 while(operators.Peek() != '[')
                     eval();
                 operators.Pop();
+                switch(operands.Pop())
+                {
+                    case IntOperand b1:
+                    StringOperand priorName = (StringOperand)operands.Pop();
+                    activeOperand = priorName.value + '[' + b1.value + ']';
+                    break;
 
-                // First thing to pop is the IntOperand (throw error if not this type)
-                // Second thing to pop is the StringOperand containing prior part of the variablename
-                // Concatenate prior name + IntOperand + ]
-                // Return activetype to variable - last token type should not matter...big question mark?
-                Operand bracketResult = operands.Pop();
-                if(!bracketResult.GetType().Equals(typeof(IntOperand)))
+                    default:
                     throw new Exception("Bracket result must be an integer!");
-                StringOperand priorName = (StringOperand)operands.Pop();
-                activeOperand = priorName.value + '[' + bracketResult.ToString() + ']';
+                }
                 activeType = OperandTokenType.VARIABLE;
-                lastToken = TokenType.OPERATOR;
+                lastToken = TokenType.OPERATOR; // No operand should follow another operand
                 break;
 
                 default:
@@ -372,19 +393,6 @@
 
         void TryPushOperand()
         {
-            // Deduce the type - Can be done in advance:
-            /*
-                If active operand length is 0:
-                - If first character read in operand is a number --> integer
-                - If first character read is decimal --> decimal
-                - If a period is read at some point and operand is an integer --> decimal
-                    - If a period is read and operand is a decimal --> throw a syntax error
-                - If first character read is a single quote --> string
-                - If first character read is a letter, underscore, or exclamation --> expression --> Fetch from variables and:
-                    > If type is int, decimal or bool - push
-                    > If expression - evaluate in recursive call (.json string vars should be capable of acting as standalone expressions)
-                    > If it can't be found in the variable dictionary - throw an error
-            */
             switch(activeType)
             {
                 // We might not have an operand to push (equivalent to token string being empty)
@@ -405,14 +413,14 @@
 
                 case OperandTokenType.VARIABLE:
                     bool isGlobal = globalVars.ContainsKey(activeOperand);
-                    bool isLocal = localVars.ContainsKey(activeOperand);
+                    bool isLocal = exp.localVars.ContainsKey(activeOperand);
 
                     // Checking for variable presence in both dictionaries shouldn't be necessary
                     // if the rest of the code is put together properly
                     if(!isGlobal && !isLocal)
                         throw new Exception("Could not find variable '" + activeOperand + "'");
                     
-                    Operand varValue = isGlobal ? globalVars[activeOperand] : localVars[activeOperand];
+                    Operand varValue = isGlobal ? globalVars[activeOperand] : exp.localVars[activeOperand];
 
                     switch(varValue)
                     {
@@ -450,9 +458,9 @@
                 char delimiter = i == rawParms.Length - 1 ? ')' : ',';
                 bool foundParamEndIndex = false;
                 Stack<char> extraDelimiters = new Stack<char>();
-                while(!foundParamEndIndex && closeIndex < exp.Length)
+                while(!foundParamEndIndex && closeIndex < exp.value.Length)
                 {
-                    switch(exp[closeIndex])
+                    switch(exp.value[closeIndex])
                     {
                         case '(':
                         if(extraDelimiters.Count > 0)
@@ -485,7 +493,7 @@
                                 break;
 
                                 case '\'':
-                                if(exp[closeIndex - 1] != '`') // Accounts for escape sequence
+                                if(exp.value[closeIndex - 1] != '`') // Accounts for escape sequence
                                     extraDelimiters.Pop();
                                 break;
                             }
@@ -507,7 +515,7 @@
                 }
                 if(!foundParamEndIndex)
                     throw new Exception("Failed to find parameter #" + (i+1) + " for function call.");
-                rawParms[i] = exp.Substring(paramStartIndex, closeIndex - paramStartIndex - 1);
+                rawParms[i] = exp.value.Substring(paramStartIndex, closeIndex - paramStartIndex - 1);
             }
             closeIndex--; // Fixup the final index to match the close parentheses
 
@@ -519,12 +527,12 @@
                 switch(parmData[i])
                 {
                     case FxParamType.PRIMITIVE:
-                        ExpressionOperand toPrim = new ExpressionOperand(rawParms[i], localVars);
+                        ExpressionOperand toPrim = new ExpressionOperand(rawParms[i], exp.localVars);
                         callVariables.Add("!" + i, evaluate(toPrim));
                     break;
 
                     case FxParamType.EXPRESSION:
-                        callVariables.addExpressionOperand("!" + i, rawParms[i], localVars);
+                        callVariables.addExpressionOperand("!" + i, rawParms[i], exp.localVars);
                     break;
 
                     case FxParamType.REFERENCE:
