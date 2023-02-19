@@ -1,4 +1,4 @@
-﻿class ExpressionSolver
+﻿class Evaluator
 {
     enum TokenType
     {
@@ -55,7 +55,7 @@
     /// Use this to load any standard variables and functions
     /// into their respective dictionaries
     /// </summary>
-    static ExpressionSolver()
+    static Evaluator()
     {
         globalVars = new VariableHandler();
         globalVars.addBoolOperand("true", true);

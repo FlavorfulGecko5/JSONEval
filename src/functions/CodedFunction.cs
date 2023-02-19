@@ -7,7 +7,7 @@ abstract class CodedFunction : FunctionDef
     // - That the parameters are of the correct FxParamType
     // What we don't know is:
     // - If Primitive Parameters are of the expected type
-    public abstract PrimitiveOperand eval(ExpressionSolver p, VariableHandler parms);
+    public abstract PrimitiveOperand eval(Evaluator p, VariableHandler parms);
 }
 
 class CodedFunction_IfElse : CodedFunction
@@ -18,7 +18,7 @@ class CodedFunction_IfElse : CodedFunction
         FxParamType.EXPRESSION
     ) {}
 
-    public override PrimitiveOperand eval(ExpressionSolver p, VariableHandler parms)
+    public override PrimitiveOperand eval(Evaluator p, VariableHandler parms)
     {
         switch(parms["!0"])
         {
@@ -40,7 +40,7 @@ class CodedFunction_And : CodedFunction
         FxParamType.EXPRESSION
     ) {}
 
-    public override PrimitiveOperand eval(ExpressionSolver p, VariableHandler parms)
+    public override PrimitiveOperand eval(Evaluator p, VariableHandler parms)
     {
         try
         {
@@ -68,7 +68,7 @@ class CodedFunction_Or : CodedFunction
         FxParamType.EXPRESSION
     ) {}
 
-    public override PrimitiveOperand eval(ExpressionSolver p, VariableHandler parms)
+    public override PrimitiveOperand eval(Evaluator p, VariableHandler parms)
     {
         try
         {
@@ -95,7 +95,7 @@ class CodedFunction_IntCast : CodedFunction
         FxParamType.PRIMITIVE
     ){}
 
-    public override PrimitiveOperand eval(ExpressionSolver p, VariableHandler parms)
+    public override PrimitiveOperand eval(Evaluator p, VariableHandler parms)
     {
         switch(parms["!0"])
         {
