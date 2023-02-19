@@ -1,16 +1,32 @@
 ﻿class ExpressionSolver
 {
+    enum TokenType
+    {
+        NONE,
+        OPERATOR,
+        OPERAND
+    }
+
+    enum OperandTokenType
+    {
+        NONE,
+        INTEGER,
+        DECIMAL,
+        STRING,
+        VARIABLE
+    }
+
     /*
     * Operators are internally represented using single characters.
     * Those operators composed of multiple characters or those with multiple
     * meanings (unary addition/subtraction) have other characters assigned
     * for their internal representation.
     */
-    const char SYM_UNARY_ADDITION = 'a';
-    const char SYM_UNARY_SUBTRACTION = 's';
-    const char SYM_NOT_EQUAL = 'e';
-    const char SYM_LESS_THAN_EQUAL = 'l';
-    const char SYM_GREATER_THAN_EQUAL = 'g';
+    const char SYM_UNARY_ADDITION = '0';
+    const char SYM_UNARY_SUBTRACTION = '2';
+    const char SYM_NOT_EQUAL = 'y';
+    const char SYM_LESS_THAN_EQUAL = '7';
+    const char SYM_GREATER_THAN_EQUAL = '9';
     const int PRECEDENCE_UNARY = 5000;
     static readonly Dictionary<char, int> precedence = new Dictionary<char, int>()
     {
@@ -76,9 +92,10 @@
         OperandTokenType activeType = OperandTokenType.NONE;
         TokenType lastToken = TokenType.NONE;
 
-        for(int i = 0; i < exp.value.Length; i++)
+        int inc;
+        for(inc = 0; inc < exp.value.Length; inc++)
         {   
-            char c = exp.value[i];
+            char c = exp.value[inc];
 
             if(Char.IsWhiteSpace(c))
             {
@@ -97,7 +114,7 @@
                     case OperandTokenType.VARIABLE: break;
 
                     default:
-                    throw new Exception("Invalid char");
+                    throw SyntaxError(inc, "Improper placement of a letter or underscore.");
                 }
                 activeOperand += c;
                 continue;
@@ -109,14 +126,14 @@
                 case '5': case '6': case '7': case '8': case '9':
                 if(activeType == OperandTokenType.NONE)
                     activeType = OperandTokenType.INTEGER;
-                activeOperand += c; // Possible alternative - track start index and length then take substring?
+                activeOperand += c; 
                 break;
 
                 case '.':
                 switch(activeType)
                 {
                     case OperandTokenType.DECIMAL:
-                    throw new Exception("Extra decimal");
+                    throw SyntaxError(inc, "A period was already placed in this decimal value");
 
                     case OperandTokenType.NONE: case OperandTokenType.INTEGER:
                     activeType = OperandTokenType.DECIMAL;
@@ -132,7 +149,7 @@
 
                 case '!':
                 if(activeType != OperandTokenType.NONE)
-                    throw new Exception("Exclamation marks may only be at the start of a variable");
+                    throw SyntaxError(inc, "Exclamation marks may only be at the start of a variable name");
                 activeType = OperandTokenType.VARIABLE;
                 activeOperand += c;
                 break;
@@ -140,22 +157,22 @@
                 // Reads and parses the entire string literal in one iteration of the for loop
                 case '\'':
                 if(activeType > OperandTokenType.NONE)
-                    throw new Exception("Transitioning to string with active operand");
+                    throw SyntaxError(inc, "Can't transition to string while parsing another operand.");
                 activeType = OperandTokenType.STRING;
 
                 int stringEndIndex = -1;
-                for(int j = i+1; j < exp.value.Length; j++)
+                for(int j = inc+1; j < exp.value.Length; j++)
                     if(exp.value[j] == '\'' && exp.value[j-1] != '`')
                     {
                         stringEndIndex = j;
                         break;
                     }
                 if(stringEndIndex == -1)
-                    throw new Exception("Could not find end to string");
+                    throw SyntaxError(exp.value.Length - 1, "String literal has no end-quote");
                 
                 // At this point we know the start and end index of the string,
                 // and that the index before the end quote does not have a `
-                for(int j = i+1; j < stringEndIndex; j++)
+                for(int j = inc+1; j < stringEndIndex; j++)
                     switch(exp.value[j])
                     {
                         // Might want to revise escape sequence system in the future,
@@ -180,7 +197,7 @@
                             case 'f': activeOperand += '\f'; break;
                             
                             default:
-                                throw new Exception("Invalid escape sequence");
+                                throw SyntaxError(j + 1, "Invalid escape sequence inside string literal.");
                         }
                         j++;
                         break;
@@ -189,48 +206,22 @@
                         activeOperand += exp.value[j];
                         break;
                     }
-
-                // Finally push the string operand
                 TryPushOperand();
-                i = stringEndIndex;
+                inc = stringEndIndex;
                 break;
 
-                case '+':
+                case '+': case '-':
                 TryPushOperand();
                 if(lastToken != TokenType.OPERAND)
-                    c = SYM_UNARY_ADDITION;
-                goto LABEL_EVAL;
+                    c += (char)5; // Byte-value shifting to eliminate redundant
+                goto LABEL_EVAL;  // case blocks
 
-                case '-':
+                case '~': case '<': case '>':
                 TryPushOperand();
-                if(lastToken != TokenType.OPERAND)
-                    c = SYM_UNARY_SUBTRACTION;
-                goto LABEL_EVAL;
-
-                case '~':
-                TryPushOperand();
-                if(exp.value[i+1] == '=')
+                if(inc != exp.value.Length - 1 && exp.value[inc+1] == '=')
                 {
-                    c = SYM_NOT_EQUAL;
-                    i++;
-                }
-                goto LABEL_EVAL;
-
-                case '<':            // Since these are operators
-                TryPushOperand();    // Out-of-bounds index implies
-                if(exp.value[i+1] == '=')  // bad expression syntax
-                {
-                    c = SYM_LESS_THAN_EQUAL;
-                    i++;
-                }
-                goto LABEL_EVAL;
-
-                case '>':
-                TryPushOperand();
-                if(exp.value[i+1] == '=')
-                {
-                    c = SYM_GREATER_THAN_EQUAL;
-                    i++;
+                    c -= (char)5;
+                    inc++;
                 }
                 goto LABEL_EVAL;
 
@@ -238,6 +229,20 @@
                 case '=': case '&': case '|': 
                 TryPushOperand();
                 LABEL_EVAL:
+                switch(c)
+                {
+                    // Technically this has already been verified for unary add/sub
+                    case '~': case SYM_UNARY_ADDITION: case SYM_UNARY_SUBTRACTION:
+                    if(lastToken == TokenType.OPERAND)
+                        throw SyntaxError(inc, "Unary operators cannot be placed after an operand.");
+                    break;
+
+                    default:
+                    if(lastToken != TokenType.OPERAND)
+                        throw SyntaxError(inc, "Binary operators must be placed after an operand.");
+                    break;
+
+                }
                 while(operators.Count > 0)
                 {
                     // <= instead of < Causes left-right evaluation instead of right-left
@@ -254,7 +259,7 @@
 
                 case '(':
                 if(activeType == OperandTokenType.VARIABLE) // Function call where activeOperand is the function name
-                    i = functionHandler(i);                 // i becomes close parentheses index
+                    inc = functionHandler(inc);                 // i becomes close parentheses index
                 else
                 {
                     operators.Push(c);
@@ -271,6 +276,8 @@
                 break;
 
                 case '[':
+                if(activeType != OperandTokenType.VARIABLE)
+                    throw SyntaxError(inc, "Brackets may only be used as part of variable names.");
                 activeType = OperandTokenType.STRING;
                 TryPushOperand();  // The current name will be popped from
                 operators.Push(c); // the stack are resolving the bracket contents
@@ -297,11 +304,12 @@
                 break;
 
                 default:
-                throw new Exception("Unrecognized character");
+                throw SyntaxError(inc, "Invalid usage of unregistered character '" + exp.value[inc] + "'");
             }
-            printStacks(0);
         }
         TryPushOperand();
+        if(lastToken == TokenType.OPERATOR)
+            throw SyntaxError(exp.value.Length - 1, "Cannot end an expression with an operator");
         while(operators.Count > 0)
             eval();
         
@@ -393,12 +401,15 @@
 
         void TryPushOperand()
         {
+            // We might not have an operand to push
+            if(activeType == OperandTokenType.NONE)
+                return;
+            
+            if(lastToken == TokenType.OPERAND)
+                throw SyntaxError(inc == exp.value.Length ? inc - 1 : inc, 
+                    "Cannot have two operands in a row - place an operator between them.");
             switch(activeType)
             {
-                // We might not have an operand to push (equivalent to token string being empty)
-                case OperandTokenType.NONE:
-                    return;
-                
                 case OperandTokenType.INTEGER:
                     operands.Push(new IntOperand(activeOperand));
                 break;
@@ -558,34 +569,15 @@
             return closeIndex;
         }
 
-        void printStacks(int printIfOne)
+        ExpressionParsingException SyntaxError(int badCharIndex, string desc)
         {
-            if(printIfOne != 1)
-                return;
-
-            Console.Write("Operators: ");
-            foreach(char c in operators)
-                Console.Write(c + "   ");
-            Console.Write("\nOperands: ");
-            foreach(Operand o in operands)
-                Console.Write(o.ToString() + "   ");
-            Console.Write("\n\n");
+            string expFragment = exp.value.Substring(0, badCharIndex + 1);
+            string fullMessage = String.Format(
+                "Could not parse expression."
+                + "\nReason: {0}"
+                + "\nEvaluation Call Trace: "
+                + "\n> \"{1}\" <--- Error originated while parsing last character", desc, expFragment);
+            return new ExpressionParsingException(fullMessage);
         }
-    }
-
-    enum TokenType
-    {
-        NONE,
-        OPERATOR,
-        OPERAND
-    }
-
-    enum OperandTokenType
-    {
-        NONE,
-        INTEGER,
-        DECIMAL,
-        STRING,
-        VARIABLE
     }
 }

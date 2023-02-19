@@ -129,6 +129,7 @@ class Tests
         assert("250.0 <= 250", "True");
         assert("true & (4 <= 5)", "True");
         assert("~true | ~(5 + 7 > 11)", "False");
+        assert("1 + -~-1", "1");
 
         // Iteration #8 UserFunction with Primitive Parameter tests
         ExpressionSolver.functions.Add("funcA", new UserFunction("!0 + !1 + !2", FxParamType.PRIMITIVE, FxParamType.PRIMITIVE, FxParamType.PRIMITIVE));
@@ -155,7 +156,7 @@ class Tests
         assert("int(-1.5)", "-1");
         assert("int(true)", "1");
         assert("int(false)", "0");
-        
+
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
 
