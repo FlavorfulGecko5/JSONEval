@@ -79,6 +79,16 @@
         return result.ToString();
     }
 
+    public string? evaluateDebug(string exp)
+    {
+        try
+        {
+            PrimitiveOperand result = evaluate(new ExpressionOperand(exp));
+            return result.ToString();
+        }
+        catch(ExpressionParsingException){ return null;}
+    }
+
     /// <summary>
     /// Fully evaluates an expression
     /// </summary>
@@ -88,6 +98,17 @@
     {
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
+
+        /*
+        * Used to ensure proper parentheses/bracket balance
+        * May contain three symbols:
+        * e - empty stack
+        * p - parentheses
+        * b - bracket
+        */
+        Stack<char> balanceChecker = new Stack<char>();
+        balanceChecker.Push('e');
+
         string activeOperand = "";
         OperandTokenType activeType = OperandTokenType.NONE;
         TokenType lastToken = TokenType.NONE;
@@ -140,9 +161,6 @@
                     break;
 
                     case OperandTokenType.VARIABLE: break;
-
-                    default:
-                    throw new Exception("Invalid char");
                 }
                 activeOperand += c;
                 break;
@@ -258,17 +276,32 @@
                 break;
 
                 case '(':
-                if(activeType == OperandTokenType.VARIABLE) // Function call where activeOperand is the function name
-                    inc = functionHandler(inc);                 // i becomes close parentheses index
-                else
+                switch(activeType)
                 {
+                    case OperandTokenType.VARIABLE:
+                    functionHandler(); 
+                    break;
+
+                    case OperandTokenType.NONE:
+                    if(lastToken == TokenType.OPERAND)
+                        throw SyntaxError(inc, "Cannot place opening-parentheses after an operand");
+                    balanceChecker.Push('p');
                     operators.Push(c);
                     lastToken = TokenType.OPERATOR;
+                    break;
+
+                    default:
+                        throw SyntaxError(inc, "Improper placement of opening-parentheses");
                 }
                 break;
 
                 case ')':
+                if(balanceChecker.Peek() != 'p')
+                    throw SyntaxError(inc, "This closing-parentheses lacks a properly placed opening-parentheses");
+                balanceChecker.Pop();
                 TryPushOperand();
+                if (lastToken != TokenType.OPERAND)
+                    throw SyntaxError(inc, "A closing-parentheses must be placed after an operand");
                 while(operators.Peek() != '(')
                     eval();
                 operators.Pop();               // At this point, the contents of the parentheses
@@ -278,14 +311,20 @@
                 case '[':
                 if(activeType != OperandTokenType.VARIABLE)
                     throw SyntaxError(inc, "Brackets may only be used as part of variable names.");
+                balanceChecker.Push('b');
                 activeType = OperandTokenType.STRING;
                 TryPushOperand();  // The current name will be popped from
-                operators.Push(c); // the stack are resolving the bracket contents
+                operators.Push(c); // the stack after resolving the bracket contents
                 lastToken = TokenType.OPERATOR;
                 break;
 
                 case ']':
+                if(balanceChecker.Peek() != 'b')
+                    throw SyntaxError(inc, "This closing-bracket lacks a properly placed opening-bracket");
+                balanceChecker.Pop();
                 TryPushOperand();
+                if(lastToken != TokenType.OPERAND)
+                    throw SyntaxError(inc, "A closing-bracket must be placed after an operand");
                 while(operators.Peek() != '[')
                     eval();
                 operators.Pop();
@@ -297,7 +336,7 @@
                     break;
 
                     default:
-                    throw new Exception("Bracket result must be an integer!");
+                    throw SyntaxError(inc, "Bracketed expression must resolve to an integer!");
                 }
                 activeType = OperandTokenType.VARIABLE;
                 lastToken = TokenType.OPERATOR; // No operand should follow another operand
@@ -310,13 +349,12 @@
         TryPushOperand();
         if(lastToken == TokenType.OPERATOR)
             throw SyntaxError(exp.value.Length - 1, "Cannot end an expression with an operator");
+        if(balanceChecker.Peek() != 'e')
+            throw SyntaxError(exp.value.Length - 1, "Parentheses and brackets are not properly closed");
         while(operators.Count > 0)
             eval();
         
-        if(operands.Count == 1)
-            return operands.Pop();
-        else
-            throw new Exception("Evaluation Failed - Unbalanced stacks");
+        return operands.Pop();
 
         void eval()
         {
@@ -452,7 +490,7 @@
             activeType = OperandTokenType.NONE;
         }
 
-        int functionHandler(int openIndex)
+        void functionHandler()
         {
             if(!functions.ContainsKey(activeOperand))
                 throw new Exception("Function name not recognized");
@@ -461,71 +499,76 @@
             // Track parentheses/non-escaped string chars to ensure we locate the right commas
             FxParamType[] parmData = functions[activeOperand].paramInfo;
             string[] rawParms = new string[parmData.Length];
-            int closeIndex = openIndex + 1; // Gets iterated on until the close parentheses is reached
+            int closeIndex = inc + 1; // Gets iterated on until the close parentheses is reached
 
             for(int i = 0; i < rawParms.Length; i++)
             {
                 int paramStartIndex = closeIndex;
                 char delimiter = i == rawParms.Length - 1 ? ')' : ',';
                 bool foundParamEndIndex = false;
+
+                /*
+                * To extract parameters correctly we must ignore extra delimiters
+                * Stack has three symbols:
+                * e - empty stack
+                * s - string
+                * p - parentheses
+                */
                 Stack<char> extraDelimiters = new Stack<char>();
+                extraDelimiters.Push('e'); 
                 while(!foundParamEndIndex && closeIndex < exp.value.Length)
                 {
                     switch(exp.value[closeIndex])
                     {
                         case '(':
-                        if(extraDelimiters.Count > 0)
-                        {
-                            if(extraDelimiters.Peek() != '\'')
-                                extraDelimiters.Push('(');
-                        }
-                        else extraDelimiters.Push('(');
+                        if(extraDelimiters.Peek() != 's')
+                            extraDelimiters.Push('p');
                         break;
 
                         case ')':
-                        if(extraDelimiters.Count > 0)
+                        switch(extraDelimiters.Peek())
                         {
-                            if(extraDelimiters.Peek() == '(')
-                                extraDelimiters.Pop();
+                            case 's': break;
+
+                            case 'p': extraDelimiters.Pop(); break;
+
+                            case 'e':
+                            if(delimiter == ')')
+                                foundParamEndIndex = true;
+                            else
+                                throw SyntaxError(closeIndex, "Too few arguments received for function call");
+                            break;
                         }
-                        else if(delimiter == ')') // Once found, closeIndex will be delimiter index + 1
-                            foundParamEndIndex = true;
-                        else
-                            throw new Exception("Too few arguments received for function call"); 
                         break;
 
                         case '\'':
-                        if(extraDelimiters.Count > 0)
+                        switch(extraDelimiters.Peek())
                         {
-                            switch(extraDelimiters.Peek())
-                            {
-                                case '(':
-                                extraDelimiters.Push('\'');
-                                break;
+                            case 'p': case 'e':
+                            extraDelimiters.Push('s');
+                            break;
 
-                                case '\'':
-                                if(exp.value[closeIndex - 1] != '`') // Accounts for escape sequence
-                                    extraDelimiters.Pop();
-                                break;
-                            }
+                            case 's':
+                            if(exp.value[closeIndex - 1] != '`') // Accounts for escape sequence
+                                extraDelimiters.Pop();
+                            break;
                         }
-                        else extraDelimiters.Push('\'');
                         break;
 
                         case ',':
-                        if(extraDelimiters.Count == 0)
+                        if(extraDelimiters.Peek() == 'e')
                         {
                             if(delimiter == ',')
                                 foundParamEndIndex = true;
                             else
-                                throw new Exception("Too many arguments received for function call");
+                                throw SyntaxError(closeIndex, "Too many arguments received for function call");
                         }
                         break;
                     }
                     closeIndex++;
                 }
                 if(!foundParamEndIndex)
-                    throw new Exception("Failed to find parameter #" + (i+1) + " for function call.");
+                    throw SyntaxError(exp.value.Length - 1, "Failed to find parameter #" + (i+1) + " for function call.");
                 rawParms[i] = exp.value.Substring(paramStartIndex, closeIndex - paramStartIndex - 1);
             }
             closeIndex--; // Fixup the final index to match the close parentheses
@@ -566,7 +609,7 @@
             activeOperand = "";
             activeType = OperandTokenType.NONE;
             lastToken = TokenType.OPERAND;
-            return closeIndex;
+            inc = closeIndex;
         }
 
         ExpressionParsingException SyntaxError(int badCharIndex, string desc)
