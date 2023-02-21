@@ -12,3 +12,8 @@ class FunctionDefinitionException : Exception
 {
     public FunctionDefinitionException(string msg) : base(msg) {}
 }
+
+class CodedFunctionException : Exception
+{
+    public CodedFunctionException(string msg) : base(msg) {}
+}

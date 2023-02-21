@@ -28,7 +28,7 @@ class CodedFunction_IfElse : CodedFunction
                 else
                     return p.evaluate((ExpressionOperand)parms["!2"]);
             default:
-                throw new Exception("The first parameter of an If function must resolve to a Boolean");
+                throw new CodedFunctionException("The first parameter of an If function must resolve to a Boolean");
         }
     }
 }
@@ -56,7 +56,7 @@ class CodedFunction_And : CodedFunction
         }
         catch(System.InvalidCastException)
         {
-            throw new Exception("Both And function parameters must resolve to booleans");
+            throw new CodedFunctionException("Both And function parameters must resolve to booleans");
         }
     }
 }
@@ -84,7 +84,7 @@ class CodedFunction_Or : CodedFunction
         }
         catch (System.InvalidCastException)
         {
-            throw new Exception("Both Or function parameters must resolve to booleans");
+            throw new CodedFunctionException("Both Or function parameters must resolve to booleans");
         }
     }
 }
@@ -111,8 +111,8 @@ class CodedFunction_IntCast : CodedFunction
             else
                 return new IntOperand(0);
             
-            default:
-            throw new Exception("Cannot convert this type to an IntOperand");
+            default:  // CHECK IF STRING CONVERTS TO A NUMBER
+            throw new CodedFunctionException("Cannot convert this type to an IntOperand");
         }
     }
 }

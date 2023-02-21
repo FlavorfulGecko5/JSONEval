@@ -96,6 +96,9 @@
     /// <returns>The result stored in an appropriate operand object</returns>
     public PrimitiveOperand evaluate(ExpressionOperand exp)
     {
+        if(exp.value.Trim().Length == 0)
+            throw SyntaxError(exp.value.Length, "The expression is empty.");
+
         Stack<PrimitiveOperand> operands = new Stack<PrimitiveOperand>();
         Stack<char> operators = new Stack<char>();
 
@@ -449,8 +452,7 @@
                 return;
             
             if(lastToken == TokenType.OPERAND)
-                throw SyntaxError(inc == exp.value.Length ? inc - 1 : inc, 
-                    "Cannot have two operands in a row - place an operator between them.");
+                throw SyntaxError(inc, "Cannot have two operands in a row - place an operator between them.");
             switch(activeType)
             {
                 case OperandTokenType.INTEGER:
@@ -510,7 +512,7 @@
         void functionHandler()
         {
             if(!functions.ContainsKey(activeOperand))
-                throw new Exception("Function name not recognized");
+                throw SyntaxError(inc, "Function named '" + activeOperand + "' is not defined");
 
             // STEP 1: EXTRACT THE RAW PARAMETERS
             // Track parentheses/non-escaped string chars to ensure we locate the right commas
@@ -620,7 +622,17 @@
                 break;
 
                 case CodedFunction f2:
-                    operands.Push(f2.eval(this, callVariables));
+                    try {operands.Push(f2.eval(this, callVariables)); }
+                    catch(CodedFunctionException e)
+                    {
+                        throw SyntaxError(closeIndex, e.Message);
+                    }
+                    catch(ExpressionParsingException e)
+                    {
+                        string fragment = exp.value.Substring(0, closeIndex + 1);
+                        string appendMsg = String.Format("\n> \"{0}\"", fragment);
+                        throw new ExpressionParsingException(e.Message + appendMsg);  
+                    }
                 break;
             }
             activeOperand = "";
@@ -631,6 +643,8 @@
 
         ExpressionParsingException SyntaxError(int badCharIndex, string desc)
         {
+            if(badCharIndex >= exp.value.Length)
+                badCharIndex = exp.value.Length - 1;
             string expFragment = exp.value.Substring(0, badCharIndex + 1);
             string fullMessage = String.Format(
                 "{0}\nEvaluation Call Trace: "
