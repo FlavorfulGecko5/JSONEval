@@ -19,6 +19,18 @@ class BoolOperand : PrimitiveOperand
         return value.ToString();
     }
 
+    private EvaluationException GenerateError(string operatorDesc, string otherType)
+    {
+        return new EvaluationException("Cannot perform " + operatorDesc
+            + " with a Boolean and a " + otherType);
+    }
+
+    private EvaluationException GenerateError(string operatorDesc)
+    {
+        return new EvaluationException("Cannot perform " + operatorDesc
+            + " with a Boolean value.");
+    }
+
     public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
@@ -26,38 +38,38 @@ class BoolOperand : PrimitiveOperand
             case StringOperand b4:
                 return new StringOperand(value + b4.value);
             default:
-                throw new Exception("Cannot add this type to a Boolean");
+                throw GenerateError("addition", "non-string value");
         }
     }
 
     public PrimitiveOperand UnaryAdd()
     {
-        throw new Exception("Cannot unary add a boolean");
+        throw GenerateError("unary addition");
     }
 
     public PrimitiveOperand Sub(PrimitiveOperand b)
     {
-        throw new Exception("Cannot subtract from boolean");
+        throw GenerateError("subtraction");
     }
 
     public PrimitiveOperand UnarySub()
     {
-        throw new Exception("Cannot unary subtract a boolean");
+        throw GenerateError("unary subtraction");
     }
 
     public PrimitiveOperand Mult(PrimitiveOperand b)
     {
-        throw new Exception("Cannot multiply a boolean");
+        throw GenerateError("multiplication");
     }
 
     public PrimitiveOperand Div(PrimitiveOperand b)
     {
-        throw new Exception("Cannot divide a boolean");
+        throw GenerateError("division");
     }
 
     public PrimitiveOperand Rem(PrimitiveOperand b)
     {
-        throw new Exception("Cannot take remainder of a boolean");
+        throw GenerateError("remainder operations");
     }
 
     public PrimitiveOperand And(PrimitiveOperand b)
@@ -66,7 +78,7 @@ class BoolOperand : PrimitiveOperand
         {
             case BoolOperand b3: return ToOperand(value & b3.value);
             default:
-                throw new Exception("Invalid Bitwise/Logical AND operand combination");
+                throw GenerateError("bitwise/logical and operations", "non-Boolean value");
         }
     }
 
@@ -76,7 +88,7 @@ class BoolOperand : PrimitiveOperand
         {
             case BoolOperand b3: return ToOperand(value | b3.value);
             default:
-                throw new Exception("Invalid Bitwise/Logical OR operand combination");
+                throw GenerateError("bitwise/logical or operations", "non-Boolean value");
         }
     }
 
@@ -91,7 +103,7 @@ class BoolOperand : PrimitiveOperand
         {
             case BoolOperand b3: return ToOperand(value == b3.value);
             default:
-                throw new Exception("Invalid equality comparison");
+                throw GenerateError("equality comparisons", "non-Boolean value");
         }
     }
 
@@ -101,27 +113,27 @@ class BoolOperand : PrimitiveOperand
         {
             case BoolOperand b3: return ToOperand(value != b3.value);
             default:
-                throw new Exception("Invalid not-equals comparison");
+                throw GenerateError("inequality comparisons", "non-Boolean value");
         }
     }
 
     public PrimitiveOperand LessThan(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Less-Than operand combination");
+        throw GenerateError("less-than comparisons");
     }
 
     public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Less-Than-Equal operand combination");
+        throw GenerateError("less-than-equal comparisons");
     }
 
     public PrimitiveOperand GreaterThan(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Less-Than operand combination");
+        throw GenerateError("greater-than comparisons");
     }
 
     public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Greater-Than-Equal operand combination");
+        throw GenerateError("greater-than-equal comparisons");
     }
 }

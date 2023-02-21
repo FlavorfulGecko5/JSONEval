@@ -358,6 +358,7 @@
 
         void eval()
         {
+            try {
             char op = operators.Pop();
             PrimitiveOperand rightHand = operands.Pop();
 
@@ -434,6 +435,10 @@
                 case SYM_GREATER_THAN_EQUAL:
                     operands.Push(leftHand.GreaterThanEqual(rightHand));
                 break;
+            }}
+            catch(EvaluationException e)
+            {
+                throw SyntaxError(inc == exp.value.Length ? inc - 1 : inc, e.Message);
             }
         }
 
@@ -478,7 +483,7 @@
                         break;
 
                         case ExpressionOperand v2:
-                        operands.Push(evaluate(v2));
+                        operands.Push(recursiveCall(v2));
                         break;
                     }
                 break;
@@ -488,6 +493,18 @@
             activeOperand = "";
             lastToken = TokenType.OPERAND;
             activeType = OperandTokenType.NONE;
+        }
+
+        PrimitiveOperand recursiveCall(ExpressionOperand r)
+        {
+            try { return evaluate(r);}
+            catch(ExpressionParsingException e)
+            {
+                string fragment = exp.value.Substring(0, 
+                    inc == exp.value.Length ? inc - 1 : inc);
+                string appendMsg = String.Format("\n> \"{0}\"", fragment);
+                throw new ExpressionParsingException(e.Message + appendMsg);
+            }
         }
 
         void functionHandler()
@@ -582,7 +599,7 @@
                 {
                     case FxParamType.PRIMITIVE:
                         ExpressionOperand toPrim = new ExpressionOperand(rawParms[i], exp.localVars);
-                        callVariables.Add("!" + i, evaluate(toPrim));
+                        callVariables.Add("!" + i, recursiveCall(toPrim));
                     break;
 
                     case FxParamType.EXPRESSION:
@@ -599,7 +616,7 @@
             {
                 case UserFunction f1:
                     ExpressionOperand toPrim = new ExpressionOperand(f1.expression, callVariables);
-                    operands.Push(evaluate(toPrim));
+                    operands.Push(recursiveCall(toPrim));
                 break;
 
                 case CodedFunction f2:
@@ -616,10 +633,8 @@
         {
             string expFragment = exp.value.Substring(0, badCharIndex + 1);
             string fullMessage = String.Format(
-                "Could not parse expression."
-                + "\nReason: {0}"
-                + "\nEvaluation Call Trace: "
-                + "\n> \"{1}\" <--- Error originated while parsing last character", desc, expFragment);
+                "{0}\nEvaluation Call Trace: "
+                + "\n> \"{1}\" <--- Error found while parsing last character - prior characters may be responsible", desc, expFragment);
             return new ExpressionParsingException(fullMessage);
         }
     }

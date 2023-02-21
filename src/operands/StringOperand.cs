@@ -13,6 +13,18 @@ class StringOperand : PrimitiveOperand
         return value;
     }
 
+    private EvaluationException GenerateError(string operatorDesc, string otherType)
+    {
+        return new EvaluationException("Cannot perform " + operatorDesc
+            + " with a string and a " + otherType);
+    }
+
+    private EvaluationException GenerateError(string operatorDesc)
+    {
+        return new EvaluationException("Cannot perform " + operatorDesc
+            + " with a string value.");
+    }
+
     public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
@@ -26,53 +38,53 @@ class StringOperand : PrimitiveOperand
             case StringOperand b4:
                 return new StringOperand(value + b4.value);
             default:
-                throw new Exception("Cannot add this type to a String");
+                throw new EvaluationException("Unreachable");
         }
     }
 
     public PrimitiveOperand UnaryAdd()
     {
-        throw new Exception("Cannot unary add a string");
+        throw GenerateError("unary addition");
     }
 
     public PrimitiveOperand Sub(PrimitiveOperand b)
     {
-        throw new Exception("Cannot subtract from a string");
+        throw GenerateError("subtraction");
     }
 
     public PrimitiveOperand UnarySub()
     {
-        throw new Exception("Cannot unary subtract a string");
+        throw GenerateError("unary subtraction");
     }
 
     public PrimitiveOperand Mult(PrimitiveOperand b)
     {
-        throw new Exception("Cannot multiply a string");
+        throw GenerateError("multiplication");
     }
 
     public PrimitiveOperand Div(PrimitiveOperand b)
     {
-        throw new Exception("Cannot divide a string");
+        throw GenerateError("division");
     }
 
     public PrimitiveOperand Rem(PrimitiveOperand b)
     {
-        throw new Exception("Cannot take the remainder of a string");
+        throw GenerateError("remainder operations");
     }
 
     public PrimitiveOperand And(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Bitwise/Logical AND operand combination");
+        throw GenerateError("bitwise/logical and operations");
     }
 
     public PrimitiveOperand Or(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Bitwise/Logical OR operand combination");
+        throw GenerateError("bitwise/logical or operations");
     }
 
     public PrimitiveOperand Not()
     {
-        throw new Exception("Cannot perform bitwise/logical not on a string");
+        throw GenerateError("bitwise/logical not operations");
     }
 
     public PrimitiveOperand Equal(PrimitiveOperand b)
@@ -81,7 +93,7 @@ class StringOperand : PrimitiveOperand
         {
             case StringOperand b4: return BoolOperand.ToOperand(value.Equals(b4.value));
             default:
-                throw new Exception("Invalid equality comparison");
+                throw GenerateError("equality comparisons", "non-string value");
         }
     }
 
@@ -91,27 +103,27 @@ class StringOperand : PrimitiveOperand
         {
             case StringOperand b4: return BoolOperand.ToOperand(!value.Equals(b4.value));
             default:
-                throw new Exception("Invalid not-equals comparison");
+                throw GenerateError("inequality comparisons", "non-string value");
         }
     }
 
     public PrimitiveOperand LessThan(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Less-Than operand combination");
+        throw GenerateError("less-than comparisons");
     }
 
     public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Less-Than-Equal operand combination");
+        throw GenerateError("less-than-equal comparisons");
     }
 
     public PrimitiveOperand GreaterThan(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Less-Than operand combination");
+        throw GenerateError("greater-than comparisons");
     }
 
     public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Greater-Than-Equal operand combination");
+        throw GenerateError("greater-than-equal comparisons");
     }
 }

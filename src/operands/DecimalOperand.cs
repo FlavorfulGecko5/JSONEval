@@ -17,6 +17,18 @@ class DecimalOperand : PrimitiveOperand
         return value.ToString();
     }
 
+    private EvaluationException GenerateError(string operatorDesc, string otherType)
+    {
+        return new EvaluationException("Cannot perform " + operatorDesc
+            + " with a decimal and a " + otherType);
+    }
+
+    private EvaluationException GenerateError(string operatorDesc)
+    {
+        return new EvaluationException("Cannot perform " + operatorDesc 
+            + " with a decimal value.");
+    }
+
     public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
@@ -28,7 +40,7 @@ class DecimalOperand : PrimitiveOperand
             case StringOperand b4:
                 return new StringOperand(value + b4.value);
             default:
-                throw new Exception("Cannot add this type to a decimal");
+                throw GenerateError("addition", "Boolean");
         }
     }
 
@@ -46,7 +58,7 @@ class DecimalOperand : PrimitiveOperand
             case DecimalOperand b2:
                 return new DecimalOperand(value - b2.value);
             default:
-                throw new Exception("Cannot subtract this type from a decimal");
+                throw GenerateError("subtraction", "non-numerical value");
         }
     }
 
@@ -64,7 +76,7 @@ class DecimalOperand : PrimitiveOperand
             case DecimalOperand b2:
                 return new DecimalOperand(value * b2.value);
             default:
-                throw new Exception("Cannot subtract this type from a decimal");
+                throw GenerateError("multiplication", "non-numerical value");
         }
     }
 
@@ -77,7 +89,7 @@ class DecimalOperand : PrimitiveOperand
             case DecimalOperand b2:
                 return new DecimalOperand(value / b2.value);
             default:
-                throw new Exception("Cannot subtract this type from a decimal");
+                throw GenerateError("division", "non-numerical value");
         }
     }
 
@@ -90,23 +102,23 @@ class DecimalOperand : PrimitiveOperand
             case DecimalOperand b2:
                 return new DecimalOperand(value % b2.value);
             default:
-                throw new Exception("Cannot subtract this type from a decimal");
+                throw GenerateError("remainder operations", "non-numerical value");
         }
     }
 
     public PrimitiveOperand And(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Bitwise/Logical AND operand combination");
+        throw GenerateError("bitwise/logical and operations");
     }
 
     public PrimitiveOperand Or(PrimitiveOperand b)
     {
-        throw new Exception("Invalid Bitwise/Logical OR operand combination");
+        throw GenerateError("bitwise/logical or operations");
     }
 
     public PrimitiveOperand Not()
     {
-        throw new Exception("Cannot perform bitwise/logical not on a Floating-Point Number");
+        throw GenerateError("bitwise/logical not operations");
     }
 
     public PrimitiveOperand Equal(PrimitiveOperand b)
@@ -116,7 +128,7 @@ class DecimalOperand : PrimitiveOperand
             case IntOperand b1: return BoolOperand.ToOperand(value == b1.value);
             case DecimalOperand b2: return BoolOperand.ToOperand(value == b2.value);
             default:
-                throw new Exception("Invalid equality comparison");
+                throw GenerateError("equality comparisons", "non-numerical value");
         }
     }
 
@@ -127,7 +139,7 @@ class DecimalOperand : PrimitiveOperand
             case IntOperand b1: return BoolOperand.ToOperand(value != b1.value);
             case DecimalOperand b2: return BoolOperand.ToOperand(value != b2.value);
             default:
-                throw new Exception("Invalid not-equals comparison");
+                throw GenerateError("inequality comparisons", "non-numerical value");
         }
     }
 
@@ -138,7 +150,7 @@ class DecimalOperand : PrimitiveOperand
             case IntOperand b1: return BoolOperand.ToOperand(value < b1.value);
             case DecimalOperand b2: return BoolOperand.ToOperand(value < b2.value);
             default:
-                throw new Exception("Invalid Less-Than operand combination");
+                throw GenerateError("less-than comparisons", "non-numerical value");
         }
     }
 
@@ -149,7 +161,7 @@ class DecimalOperand : PrimitiveOperand
             case IntOperand b1: return BoolOperand.ToOperand(value <= b1.value);
             case DecimalOperand b2: return BoolOperand.ToOperand(value <= b2.value);
             default:
-                throw new Exception("Invalid Less-Than-Equal operand combination");
+                throw GenerateError("less-than-equal comparisons", "non-numerical value");
         }
     }
 
@@ -160,7 +172,7 @@ class DecimalOperand : PrimitiveOperand
             case IntOperand b1: return BoolOperand.ToOperand(value > b1.value);
             case DecimalOperand b2: return BoolOperand.ToOperand(value > b2.value);
             default:
-                throw new Exception("Invalid Greater-Than operand combination");
+                throw GenerateError("greater-than comparisons", "non-numerical value");
         }
     }
 
@@ -171,7 +183,7 @@ class DecimalOperand : PrimitiveOperand
             case IntOperand b1: return BoolOperand.ToOperand(value >= b1.value);
             case DecimalOperand b2: return BoolOperand.ToOperand(value >= b2.value);
             default:
-                throw new Exception("Invalid Greater-Than-Equal operand combination");
+                throw GenerateError("greater-than-equal comparisons", "non-numerical value");
         }
     }
 }
