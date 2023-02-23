@@ -157,6 +157,18 @@ class Tests
         assert("int(true)", "1");
         assert("int(false)", "0");
 
+        // Iteration #10 Shadowing and Reference parameters
+        Evaluator.functions.Add("reftest", new UserFunction("reftestnested(!0, !0.subname)", FxParamType.REFERENCE));
+        Evaluator.functions.Add("reftestnested", new UserFunction("!0 + !1", FxParamType.REFERENCE, FxParamType.REFERENCE));
+        Evaluator.functions.Add("refbracket", new UserFunction("!0[0]", FxParamType.REFERENCE));
+        Evaluator.globalVars.addIntOperand("xyz", -123);
+        Evaluator.globalVars.addIntOperand("xyz.subname", -340);
+        Evaluator.globalVars.addIntOperand("xyz[0]", 34);
+        Evaluator.globalVars.addIntOperand("xyz[0][0]", -4544);
+        assert("reftest(xyz)", "-463");
+        assert("refbracket( xyz )", "34");
+        assert("refbracket(xyz[0])", "-4544");
+
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
 

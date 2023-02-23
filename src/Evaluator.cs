@@ -79,22 +79,13 @@
         return result.ToString();
     }
 
-    public string? evaluateDebug(string exp)
-    {
-        try
-        {
-            PrimitiveOperand result = evaluate(new ExpressionOperand(exp));
-            return result.ToString();
-        }
-        catch(ExpressionParsingException){ return null;}
-    }
-
     /// <summary>
     /// Fully evaluates an expression
     /// </summary>
     /// <param name="exp">The expression to evaluate</param>
+    /// <param name="flag_reference">If true, treat the expresion as a reference parameter</param>
     /// <returns>The result stored in an appropriate operand object</returns>
-    public PrimitiveOperand evaluate(ExpressionOperand exp)
+    public PrimitiveOperand evaluate(ExpressionOperand exp, bool flag_reference=false)
     {
         if(exp.value.Trim().Length == 0)
             throw SyntaxError(exp.value.Length, "The expression is empty.");
@@ -163,7 +154,10 @@
                     activeType = OperandTokenType.DECIMAL;
                     break;
 
-                    case OperandTokenType.VARIABLE: break;
+                    case OperandTokenType.VARIABLE:
+                    if(exp.value[inc-1] == '.')
+                        throw SyntaxError(inc, "Variable names cannot contain two consecutive periods."); 
+                    break;
                 }
                 activeOperand += c;
                 break;
@@ -279,6 +273,8 @@
                 break;
 
                 case '(':
+                if (flag_reference && balanceChecker.Peek() == 'e')
+                    throw SyntaxError(inc, "Cannot pass a function call or expression as a reference parameter");
                 switch(activeType)
                 {
                     case OperandTokenType.VARIABLE:
@@ -299,12 +295,12 @@
                 break;
 
                 case ')':
-                if(balanceChecker.Peek() != 'p')
-                    throw SyntaxError(inc, "This closing-parentheses lacks a properly placed opening-parentheses");
-                balanceChecker.Pop();
                 TryPushOperand();
                 if (lastToken != TokenType.OPERAND)
                     throw SyntaxError(inc, "A closing-parentheses must be placed after an operand");
+                if(balanceChecker.Peek() != 'p')
+                    throw SyntaxError(inc, "This closing-parentheses lacks a properly placed opening-parentheses");
+                balanceChecker.Pop();
                 while(operators.Peek() != '(')
                     eval();
                 operators.Pop();               // At this point, the contents of the parentheses
@@ -322,12 +318,12 @@
                 break;
 
                 case ']':
-                if(balanceChecker.Peek() != 'b')
-                    throw SyntaxError(inc, "This closing-bracket lacks a properly placed opening-bracket");
-                balanceChecker.Pop();
                 TryPushOperand();
                 if(lastToken != TokenType.OPERAND)
                     throw SyntaxError(inc, "A closing-bracket must be placed after an operand");
+                if(balanceChecker.Peek() != 'b')
+                    throw SyntaxError(inc, "This closing-bracket lacks a properly placed opening-bracket");
+                balanceChecker.Pop();
                 while(operators.Peek() != '[')
                     eval();
                 operators.Pop();
@@ -444,16 +440,28 @@
                 throw SyntaxError(inc == exp.value.Length ? inc - 1 : inc, e.Message);
             }
         }
-
+       
         void TryPushOperand()
-        {
+        {          
             // We might not have an operand to push
             if(activeType == OperandTokenType.NONE)
                 return;
             
             if(lastToken == TokenType.OPERAND)
                 throw SyntaxError(inc, "Cannot have two operands in a row - place an operator between them.");
-            switch(activeType)
+
+            if (flag_reference && balanceChecker.Peek() == 'e')
+            {
+                if(activeType != OperandTokenType.VARIABLE)
+                    throw SyntaxError(inc, "A reference parameter cannot be a literal value");
+                if(operators.Count > 0 || operands.Count > 0)
+                    throw SyntaxError(inc, "A reference parameter may only have bracketed expressions");
+                for(int k = inc; k < exp.value.Length; k++)
+                    if(!Char.IsWhiteSpace(exp.value[k]))
+                        throw SyntaxError(k, "A reference parameter must be a single variable name");
+                operands.Push(new StringOperand(activeOperand));
+            }
+            else switch(activeType)
             {
                 case OperandTokenType.INTEGER:
                     operands.Push(new IntOperand(activeOperand));
@@ -474,9 +482,9 @@
                     // Checking for variable presence in both dictionaries shouldn't be necessary
                     // if the rest of the code is put together properly
                     if(!isGlobal && !isLocal)
-                        throw new Exception("Could not find variable '" + activeOperand + "'");
+                        throw SyntaxError(inc, "Could not find variable '" + activeOperand + "'");
                     
-                    Operand varValue = isGlobal ? globalVars[activeOperand] : exp.localVars[activeOperand];
+                    Operand varValue = isLocal ? exp.localVars[activeOperand] : globalVars[activeOperand];
 
                     switch(varValue)
                     {
@@ -497,9 +505,9 @@
             activeType = OperandTokenType.NONE;
         }
 
-        PrimitiveOperand recursiveCall(ExpressionOperand r)
+        PrimitiveOperand recursiveCall(ExpressionOperand r, bool setRefFlag=false)
         {
-            try { return evaluate(r);}
+            try { return evaluate(r, setRefFlag);}
             catch(ExpressionParsingException e)
             {
                 string fragment = exp.value.Substring(0, 
@@ -591,6 +599,7 @@
                 rawParms[i] = exp.value.Substring(paramStartIndex, closeIndex - paramStartIndex - 1);
             }
             closeIndex--; // Fixup the final index to match the close parentheses
+            inc = closeIndex; // Do this here for more accurate error messages
 
             // STEP 2: BUILD LOCAL CALL PARMS
             VariableHandler callVariables = new VariableHandler();
@@ -608,8 +617,28 @@
                         callVariables.addExpressionOperand("!" + i, rawParms[i], exp.localVars);
                     break;
 
-                    case FxParamType.REFERENCE:
-                    throw new Exception("Not implemented");
+                    case FxParamType.REFERENCE: // Allow for evaluation of bracket contents before checking for existence
+                        ExpressionOperand toRef = new ExpressionOperand(rawParms[i], exp.localVars);
+                        StringOperand refVarName = (StringOperand)recursiveCall(toRef, true);
+
+                        bool isLocal = exp.localVars.ContainsKey(refVarName.value);
+                        bool isGlobal = globalVars.ContainsKey(refVarName.value);
+
+                        if(!isLocal && !isGlobal)
+                            throw SyntaxError(closeIndex, "Reference parameter '" + refVarName.value + "' is not defined as a variable.");
+                        
+                        copyVars(globalVars);
+                        copyVars(exp.localVars); // Local vars will shadow global vars
+                        void copyVars(VariableHandler v)
+                        {
+                            foreach(string key in v.Keys)
+                                if(key.StartsWith(refVarName.value, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    string extension = key.Substring(refVarName.value.Length);
+                                    callVariables["!" + i + extension] = v[key];
+                                }
+                        }
+                    break;
                 }
             }
 
@@ -638,7 +667,6 @@
             activeOperand = "";
             activeType = OperandTokenType.NONE;
             lastToken = TokenType.OPERAND;
-            inc = closeIndex;
         }
 
         ExpressionParsingException SyntaxError(int badCharIndex, string desc)
