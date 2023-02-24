@@ -4,15 +4,15 @@ namespace JSONEval.ExpressionEvaluation;
 class ExpressionOperand : Operand
 {
     public string value { get; private set; }
-    public VariableHandler localVars;
+    public VarDictionary localVars;
 
     public ExpressionOperand(string vParam)
     {
         value = vParam;
-        localVars = new VariableHandler();
+        localVars = new VarDictionary();
     }
 
-    public ExpressionOperand(string vParam, VariableHandler lvParam)
+    public ExpressionOperand(string vParam, VarDictionary lvParam)
     {
         value = vParam;
         localVars = lvParam;

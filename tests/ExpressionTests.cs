@@ -1,11 +1,11 @@
 namespace JSONEval.Tests;
 using JSONEval.ExpressionEvaluation;
 using System.Diagnostics;
-class Tests
+class ExpressionTests
 {
     public static void Main(string[] args)
     {
-        Tests.RunUnitTests();
+        ExpressionTests.RunUnitTests();
     }
 
     public static void RunUnitTests()
@@ -69,27 +69,27 @@ class Tests
         assert("'`''", "'");
 
         // Iteration #5 basic variable tests
-        Evaluator.globalVars.addIntOperand("firstvar", 34);
+        Evaluator.globalVars.AddIntVar("firstvar", 34);
         assert("firstvar", "34");
         assert("FIRSTVAR + 500", "534");
-        Evaluator.globalVars.addExpressionOperand("basicexpression", "1 + 2 + 3");
+        Evaluator.globalVars.AddExpressionVar("basicexpression", "1 + 2 + 3");
         assert("basicexpression", "6");
         assert("true", "True");
         assert("FALSE", "False");
         assert("true + ' big victory'", "True big victory");
         assert("firstvar * basicexpression", "204");
-        Evaluator.globalVars.addExpressionOperand("nested", "basicexpression + firstvar");
+        Evaluator.globalVars.AddExpressionVar("nested", "basicexpression + firstvar");
         assert("nested", "40");
 
         // Iteration #6 variable naming tests
-        Evaluator.globalVars.addIntOperand("_hello_there", 450);
+        Evaluator.globalVars.AddIntVar("_hello_there", 450);
         assert("_hello_there", "450");
-        Evaluator.globalVars.addIntOperand("!advanced.naming.stuff", 400);
+        Evaluator.globalVars.AddIntVar("!advanced.naming.stuff", 400);
         assert("!advanced.naming.stuff", "400");
-        Evaluator.globalVars.addIntOperand("b[0]", 234);
-        Evaluator.globalVars.addIntOperand("b[1]", 100);
-        Evaluator.globalVars.addIntOperand("b[0][0]", 5);
-        Evaluator.globalVars.addIntOperand("b[100]", -1);
+        Evaluator.globalVars.AddIntVar("b[0]", 234);
+        Evaluator.globalVars.AddIntVar("b[1]", 100);
+        Evaluator.globalVars.AddIntVar("b[0][0]", 5);
+        Evaluator.globalVars.AddIntVar("b[100]", -1);
         assert("b[0]", "234");
         assert("b[10 * 10 - 100]", "234");
         assert("b[b[1] + b[0] - 334]", "234");
@@ -160,10 +160,10 @@ class Tests
         Evaluator.functions.Add("reftest", new UserFunction("reftestnested(!0, !0.subname)", FxParamType.REFERENCE));
         Evaluator.functions.Add("reftestnested", new UserFunction("!0 + !1", FxParamType.REFERENCE, FxParamType.REFERENCE));
         Evaluator.functions.Add("refbracket", new UserFunction("!0[0]", FxParamType.REFERENCE));
-        Evaluator.globalVars.addIntOperand("xyz", -123);
-        Evaluator.globalVars.addIntOperand("xyz.subname", -340);
-        Evaluator.globalVars.addIntOperand("xyz[0]", 34);
-        Evaluator.globalVars.addIntOperand("xyz[0][0]", -4544);
+        Evaluator.globalVars.AddIntVar("xyz", -123);
+        Evaluator.globalVars.AddIntVar("xyz.subname", -340);
+        Evaluator.globalVars.AddIntVar("xyz[0]", 34);
+        Evaluator.globalVars.AddIntVar("xyz[0][0]", -4544);
         assert("reftest(xyz)", "-463");
         assert("refbracket( xyz )", "34");
         assert("refbracket(xyz[0])", "-4544");

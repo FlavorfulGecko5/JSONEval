@@ -45,7 +45,7 @@ class Evaluator
     /// <summary>
     /// All expressions can use the variables stored here
     /// </summary>
-    public static VariableHandler globalVars;
+    public static VarDictionary globalVars;
 
     /// <summary>
     /// Info for all available functions (user-defined and hard-coded)
@@ -58,9 +58,9 @@ class Evaluator
     /// </summary>
     static Evaluator()
     {
-        globalVars = new VariableHandler();
-        globalVars.addBoolOperand("true", true);
-        globalVars.addBoolOperand("false", false);
+        globalVars = new VarDictionary();
+        globalVars.AddBoolVar("true", true);
+        globalVars.AddBoolVar("false", false);
 
         functions = new FunctionHandler();
         functions.Add("if", new CodedFunction_IfElse());
@@ -583,7 +583,7 @@ class Evaluator
             inc = closeIndex; // Do this here for more accurate error messages
 
             // STEP 2: BUILD LOCAL CALL PARMS
-            VariableHandler callVariables = new VariableHandler();
+            VarDictionary callVariables = new VarDictionary();
 
             for(int i = 0; i < rawParms.Length; i++)
             {
@@ -595,7 +595,7 @@ class Evaluator
                     break;
 
                     case FxParamType.EXPRESSION:
-                        callVariables.addExpressionOperand("!" + i, rawParms[i], exp.localVars);
+                        callVariables.AddExpressionVar("!" + i, rawParms[i], exp.localVars);
                     break;
 
                     case FxParamType.REFERENCE: // Allow for evaluation of bracket contents before checking for existence
@@ -610,7 +610,7 @@ class Evaluator
                         
                         copyVars(globalVars);
                         copyVars(exp.localVars); // Local vars will shadow global vars
-                        void copyVars(VariableHandler v)
+                        void copyVars(VarDictionary v)
                         {
                             if(v.ContainsKey(refName))
                                 callVariables["!" + i] = v[refName];
