@@ -1,27 +1,38 @@
 namespace JSONEval.ExpressionEvaluation;
+
+/// <summary>
+/// An Operand representing a standard integer value
+/// </summary>
 class IntOperand : PrimitiveOperand
 {
+    /// <summary>
+    /// The Operand's integer value
+    /// </summary>
     public int value { get; private set; }
 
+    /// <param name="vParam">The desired operand value</param>
     public IntOperand(int vParam)
     {
         value = vParam;
     }
 
-    public IntOperand(string vParam)
+    /* 
+    * Simplfies Exception generation 
+    */
+
+    private OperatorEvaluationException GenerateError(string operatorDesc, string otherType)
     {
-        value = Int32.Parse(vParam);
+        return new OperatorEvaluationException("Cannot perform " + operatorDesc
+            + " with an integer and a " + otherType);
     }
+
+    /*
+    * PrimitiveOperand method implementations
+    */
 
     public override string ToString()
     {
         return value.ToString();
-    }
-
-    private EvaluationException GenerateError(string operatorDesc, string otherType)
-    {
-        return new EvaluationException("Cannot perform " + operatorDesc
-            + " with an integer and a " + otherType);
     }
 
     public PrimitiveOperand Add(PrimitiveOperand b)
@@ -80,6 +91,8 @@ class IntOperand : PrimitiveOperand
         switch (b)
         {
             case IntOperand b1:
+                if (b1.value == 0)
+                    throw new OperatorEvaluationException("Attempted to divide by 0");
                 return new IntOperand(value / b1.value);
             case DecimalOperand b2:
                 return new DecimalOperand(value / b2.value);
@@ -93,6 +106,8 @@ class IntOperand : PrimitiveOperand
         switch (b)
         {
             case IntOperand b1:
+                if (b1.value == 0)
+                    throw new OperatorEvaluationException("Attempted to take the remainder with 0");
                 return new IntOperand(value % b1.value);
             case DecimalOperand b2:
                 return new DecimalOperand(value % b2.value);

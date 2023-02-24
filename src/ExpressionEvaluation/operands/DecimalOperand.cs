@@ -1,33 +1,44 @@
 namespace JSONEval.ExpressionEvaluation;
+
+/// <summary>
+/// An Operand representing a decimal (floating-point) value
+/// </summary>
 class DecimalOperand : PrimitiveOperand
 {
+    /// <summary>
+    /// The Operand's decimal value
+    /// </summary>
     public double value { get; private set; }
 
+    /// <param name="vParam">The desired Operand value</param>
     public DecimalOperand(double vParam)
     {
         value = vParam;
     }
 
-    public DecimalOperand(string vParam)
+    /*
+    * Simplifies Exception generation
+    */
+
+    private OperatorEvaluationException GenerateError(string operatorDesc, string otherType)
     {
-        value = Double.Parse(vParam);
+        return new OperatorEvaluationException("Cannot perform " + operatorDesc
+            + " with a decimal and a " + otherType);
     }
+
+    private OperatorEvaluationException GenerateError(string operatorDesc)
+    {
+        return new OperatorEvaluationException("Cannot perform " + operatorDesc 
+            + " with a decimal value.");
+    }
+
+    /*
+    * PrimitiveOperand method implementations
+    */
 
     public override string ToString()
     {
         return value.ToString();
-    }
-
-    private EvaluationException GenerateError(string operatorDesc, string otherType)
-    {
-        return new EvaluationException("Cannot perform " + operatorDesc
-            + " with a decimal and a " + otherType);
-    }
-
-    private EvaluationException GenerateError(string operatorDesc)
-    {
-        return new EvaluationException("Cannot perform " + operatorDesc 
-            + " with a decimal value.");
     }
 
     public PrimitiveOperand Add(PrimitiveOperand b)

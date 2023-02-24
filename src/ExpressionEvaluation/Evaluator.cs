@@ -84,7 +84,7 @@ class Evaluator
     /// Fully evaluates an expression
     /// </summary>
     /// <param name="exp">The expression to evaluate</param>
-    /// <param name="flag_reference">If true, treat the expresion as a reference parameter</param>
+    /// <param name="flag_reference">If true, treat the expression as a reference parameter</param>
     /// <returns>The result stored in an appropriate operand object</returns>
     public PrimitiveOperand evaluate(ExpressionOperand exp, bool flag_reference=false)
     {
@@ -416,7 +416,7 @@ class Evaluator
                     operands.Push(leftHand.GreaterThanEqual(rightHand));
                 break;
             }}
-            catch(EvaluationException e)
+            catch(OperatorEvaluationException e)
             {
                 throw SyntaxError(inc, e.Message);
             }
@@ -445,11 +445,17 @@ class Evaluator
             else switch(activeType)
             {
                 case OperandTokenType.INTEGER:
-                    operands.Push(new IntOperand(activeOperand));
+                    int tp1;
+                    if(!Int32.TryParse(activeOperand, out tp1))
+                        throw SyntaxError(inc, "Could not convert integer literal from a string to it's real value");
+                    operands.Push(new IntOperand(tp1));
                 break;
 
                 case OperandTokenType.DECIMAL:
-                    operands.Push(new DecimalOperand(activeOperand));
+                    double tp2;
+                    if(!Double.TryParse(activeOperand, out tp2))
+                        throw SyntaxError(inc, "Could not convert decimal literal from a string to it's real value");
+                    operands.Push(new DecimalOperand(tp2));
                 break;
 
                 case OperandTokenType.STRING:

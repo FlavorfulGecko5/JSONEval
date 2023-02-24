@@ -1,29 +1,44 @@
 namespace JSONEval.ExpressionEvaluation;
-// Only string literals read from expressions should use this
+
+/// <summary>
+/// An Operand representing a string value
+/// </summary>
 class StringOperand : PrimitiveOperand
 {
+    /// <summary>
+    /// The Operand's string value
+    /// </summary>
     public string value { get; private set; }
 
+    /// <param name="vParam">The desired operand value</param>
     public StringOperand(string vParam)
     {
         value = vParam;
     }
 
-    public override string ToString()
-    {
-        return value;
-    }
+    /*
+    * Simplifies Exception generation
+    */
 
-    private EvaluationException GenerateError(string operatorDesc, string otherType)
+    private OperatorEvaluationException GenerateError(string operatorDesc, string otherType)
     {
-        return new EvaluationException("Cannot perform " + operatorDesc
+        return new OperatorEvaluationException("Cannot perform " + operatorDesc
             + " with a string and a " + otherType);
     }
 
-    private EvaluationException GenerateError(string operatorDesc)
+    private OperatorEvaluationException GenerateError(string operatorDesc)
     {
-        return new EvaluationException("Cannot perform " + operatorDesc
+        return new OperatorEvaluationException("Cannot perform " + operatorDesc
             + " with a string value.");
+    }
+
+    /*
+    * PrimitiveOperand method implementations
+    */
+
+    public override string ToString()
+    {
+        return value;
     }
 
     public PrimitiveOperand Add(PrimitiveOperand b)
@@ -39,7 +54,7 @@ class StringOperand : PrimitiveOperand
             case StringOperand b4:
                 return new StringOperand(value + b4.value);
             default:
-                throw new EvaluationException("Unreachable");
+                throw new OperatorEvaluationException("Unreachable");
         }
     }
 
