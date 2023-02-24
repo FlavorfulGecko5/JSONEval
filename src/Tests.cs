@@ -65,9 +65,6 @@ class Tests
 
         // Iteration #4 String Escape Sequence Tests
         assert("'`''", "'");
-        assert(@"'\n'", "\n"); // Better way to test these would be by reading lines from a file
-        assert(@"'\\hooray\\'", @"\hooray\");
-        
 
         // Iteration #5 basic variable tests
         Evaluator.globalVars.addIntOperand("firstvar", 34);
@@ -168,6 +165,10 @@ class Tests
         assert("reftest(xyz)", "-463");
         assert("refbracket( xyz )", "34");
         assert("refbracket(xyz[0])", "-4544");
+
+        // Iteration #11 String escape sequence revisions
+        assert("'`n'", "\n");
+        assert("'``t'", "`\t");
 
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);

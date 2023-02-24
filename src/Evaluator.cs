@@ -171,7 +171,7 @@
 
                 // Reads and parses the entire string literal in one iteration of the for loop
                 case '\'':
-                if(activeType > OperandTokenType.NONE)
+                if(activeType != OperandTokenType.NONE)
                     throw SyntaxError(inc, "Can't transition to string while parsing another operand.");
                 activeType = OperandTokenType.STRING;
 
@@ -188,39 +188,19 @@
                 // At this point we know the start and end index of the string,
                 // and that the index before the end quote does not have a `
                 for(int j = inc+1; j < stringEndIndex; j++)
-                    switch(exp.value[j])
+                    if(exp.value[j] == '`')
                     {
-                        // Might want to revise escape sequence system in the future,
-                        // considering the revelation that System.Data did not have escape sequences
-                        case '`':
-                            if(exp.value[j+1] == '\'')
-                            {
-                                activeOperand += '\'';
-                                j++;
-                            }          
-                        break;
-
-                        case '\\':
-                        switch(exp.value[j+1]) // This can include the end quote if before it
+                        switch(exp.value[j+1])
                         {
-                            // All JSON-supported escape sequences
-                            case '\\': activeOperand += '\\'; break;
-                            case 'n': activeOperand += '\n'; break;
-                            case 't': activeOperand += '\t'; break;
-                            case 'b': activeOperand += '\b'; break;
-                            case 'r': activeOperand += '\r'; break;
-                            case 'f': activeOperand += '\f'; break;
-                            
-                            default:
-                                throw SyntaxError(j + 1, "Invalid escape sequence inside string literal.");
+                            case '\'': activeOperand += '\''; break;
+                            case 'n':  activeOperand += '\n'; break;
+                            case 't':  activeOperand += '\t'; break;
+                            default:   activeOperand += '`'; j--; break;
                         }
                         j++;
-                        break;
-
-                        default:
-                        activeOperand += exp.value[j];
-                        break;
                     }
+                    else
+                        activeOperand += exp.value[j];
                 TryPushOperand();
                 inc = stringEndIndex;
                 break;
@@ -437,7 +417,7 @@
             }}
             catch(EvaluationException e)
             {
-                throw SyntaxError(inc == exp.value.Length ? inc - 1 : inc, e.Message);
+                throw SyntaxError(inc, e.Message);
             }
         }
        
@@ -619,23 +599,26 @@
 
                     case FxParamType.REFERENCE: // Allow for evaluation of bracket contents before checking for existence
                         ExpressionOperand toRef = new ExpressionOperand(rawParms[i], exp.localVars);
-                        StringOperand refVarName = (StringOperand)recursiveCall(toRef, true);
+                        string refName = ((StringOperand)recursiveCall(toRef, true)).value;
 
-                        bool isLocal = exp.localVars.ContainsKey(refVarName.value);
-                        bool isGlobal = globalVars.ContainsKey(refVarName.value);
+                        bool isLocal = exp.localVars.ContainsKey(refName);
+                        bool isGlobal = globalVars.ContainsKey(refName);
 
                         if(!isLocal && !isGlobal)
-                            throw SyntaxError(closeIndex, "Reference parameter '" + refVarName.value + "' is not defined as a variable.");
+                            throw SyntaxError(closeIndex, "Reference parameter '" + refName + "' is not defined as a variable.");
                         
                         copyVars(globalVars);
                         copyVars(exp.localVars); // Local vars will shadow global vars
                         void copyVars(VariableHandler v)
                         {
+                            if(v.ContainsKey(refName))
+                                callVariables["!" + i] = v[refName];
                             foreach(string key in v.Keys)
-                                if(key.StartsWith(refVarName.value, StringComparison.OrdinalIgnoreCase))
+                                if(key.StartsWith(refName, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    string extension = key.Substring(refVarName.value.Length);
-                                    callVariables["!" + i + extension] = v[key];
+                                    string extension = key.Substring(refName.Length);
+                                    if(extension.Length > 0 && (extension[0] == '.' || extension[0] == '['))
+                                        callVariables["!" + i + extension] = v[key];
                                 }
                         }
                     break;
@@ -671,7 +654,7 @@
 
         ExpressionParsingException SyntaxError(int badCharIndex, string desc)
         {
-            if(badCharIndex >= exp.value.Length)
+            if(badCharIndex >= exp.value.Length) // Convenient catch-all
                 badCharIndex = exp.value.Length - 1;
             string expFragment = exp.value.Substring(0, badCharIndex + 1);
             string fullMessage = String.Format(
