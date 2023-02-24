@@ -1,4 +1,5 @@
-﻿class Evaluator
+﻿namespace JSONEval.ExpressionEvaluation;
+class Evaluator
 {
     enum TokenType
     {

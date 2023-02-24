@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 interface Operand {}
 
 interface PrimitiveOperand : Operand

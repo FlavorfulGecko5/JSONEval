@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 class VariableHandler : Dictionary<string, Operand>
 {
     public VariableHandler() : base(StringComparer.OrdinalIgnoreCase) {}

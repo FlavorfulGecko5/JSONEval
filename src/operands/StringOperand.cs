@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 // Only string literals read from expressions should use this
 class StringOperand : PrimitiveOperand
 {

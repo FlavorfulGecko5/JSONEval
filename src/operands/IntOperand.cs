@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 class IntOperand : PrimitiveOperand
 {
     public int value { get; private set; }

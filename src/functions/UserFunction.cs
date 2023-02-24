@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 class UserFunction : FunctionDef
 {
     public string expression;

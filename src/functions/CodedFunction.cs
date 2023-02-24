@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 abstract class CodedFunction : FunctionDef
 {
     public CodedFunction(params FxParamType[] p_paramInfo) : base(p_paramInfo) {}

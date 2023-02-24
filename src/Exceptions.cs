@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 class ExpressionParsingException : Exception
 {
     public ExpressionParsingException(string msg) : base(msg) {}

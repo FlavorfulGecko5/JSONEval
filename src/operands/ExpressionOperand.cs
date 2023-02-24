@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 // String variables from configuration files should be regarded as sub-expressions
 // being substituted into the main expression 
 class ExpressionOperand : Operand

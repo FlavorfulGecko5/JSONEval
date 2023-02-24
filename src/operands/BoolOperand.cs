@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 class BoolOperand : PrimitiveOperand
 {
     public static readonly BoolOperand TRUE = new BoolOperand(){value = true};

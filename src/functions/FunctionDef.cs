@@ -1,3 +1,4 @@
+namespace JSONEval.ExpressionEvaluation;
 abstract class FunctionDef
 {
     public FxParamType[] paramInfo;
