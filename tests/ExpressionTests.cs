@@ -10,7 +10,6 @@ class ExpressionTests
 
     public static void RunUnitTests()
     {
-        Evaluator p = new Evaluator();
         Stopwatch timer = new Stopwatch();
         timer.Start();
 
@@ -172,12 +171,35 @@ class ExpressionTests
         assert("'`n'", "\n");
         assert("'``t'", "`\t");
 
+        // Iteration #12 More Functions
+        assert("int('-400')", "-400");
+        assert("decimal(2)", "2");
+        assert("decimal(0.25)", "0.25");
+        assert("decimal(true)", "1");
+        assert("decimal(false)", "0");
+        assert("decimal('-1.5')", "-1.5");
+        assert("bool(1.4)", "True");
+        assert("bool(1)", "True");
+        assert("bool(0.9)", "False");
+        assert("bool(0)", "False");
+        assert("bool(-1.5)", "False");
+        assert("bool('TRUE')", "True");
+        assert("bool('fALSe')", "False");
+        assert("string(234)", "234");
+        assert("string(4.5)", "4.5");
+        assert("string(true)", "True");
+        assert("string(False)", "False");
+        assert("loop(0, 5, 1, 0)", "5");
+        assert("loop(0, 5, !i, 0)", "10");
+        assert("loop(2, 3, loop(3, 4, !ii * !i, 0), 0)", "6");
+        assert("loop(0, 3, 'hello ', '')", "hello hello hello ");
+
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
 
         void assert(string exp, string expected)
         {
-            string result = p.evaluate(exp);
+            string result = Evaluator.evaluate(exp);
             if (!result.Equals(expected))
             {
                 Console.WriteLine("TEST FAILED:\nExpression: \"{0}\"\nExpected: \"{1}\"\nResult: \"{2}\"", exp, expected, result);

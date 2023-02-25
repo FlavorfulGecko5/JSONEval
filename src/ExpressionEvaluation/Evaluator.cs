@@ -1,5 +1,5 @@
 ﻿namespace JSONEval.ExpressionEvaluation;
-class Evaluator
+static class Evaluator
 {
     enum TokenType
     {
@@ -64,9 +64,13 @@ class Evaluator
 
         functions = new FunctionHandler();
         functions.Add("if", new CodedFunction_IfElse());
+        functions.Add("loop", new CodedFunction_Loop());
         functions.Add("and", new CodedFunction_And());
         functions.Add("or", new CodedFunction_Or());
         functions.Add("int", new CodedFunction_IntCast());
+        functions.Add("decimal", new CodedFunction_DecimalCast());
+        functions.Add("bool", new CodedFunction_BoolCast());
+        functions.Add("string", new CodedFunction_StringCast());
     }
 
     /// <summary>
@@ -74,7 +78,11 @@ class Evaluator
     /// </summary>
     /// <param name="exp">The expression to evaluate</param>
     /// <returns>The string representation of the result</returns>
-    public string evaluate(string exp)
+    /// <exception cref="ExpressionParsingException">
+    /// Thrown if the expression cannot be resolved to an Operand for any
+    /// predictable reason
+    /// </exception>
+    public static string evaluate(string exp)
     {
         PrimitiveOperand result = evaluate(new ExpressionOperand(exp));
         return result.ToString();
@@ -86,7 +94,11 @@ class Evaluator
     /// <param name="exp">The expression to evaluate</param>
     /// <param name="flag_reference">If true, treat the expression as a reference parameter</param>
     /// <returns>The result stored in an appropriate operand object</returns>
-    public PrimitiveOperand evaluate(ExpressionOperand exp, bool flag_reference=false)
+    /// <exception cref="ExpressionParsingException">
+    /// Thrown if the expression cannot be resolved to an Operand for any
+    /// predictable reason
+    /// </exception>
+    public static PrimitiveOperand evaluate(ExpressionOperand exp, bool flag_reference=false)
     {
         if(exp.value.Trim().Length == 0)
             throw SyntaxError(exp.value.Length, "The expression is empty.");
@@ -641,7 +653,7 @@ class Evaluator
                 break;
 
                 case CodedFunction f2:
-                    try {operands.Push(f2.eval(this, callVariables)); }
+                    try {operands.Push(f2.eval(callVariables)); }
                     catch(CodedFunctionException e)
                     {
                         throw SyntaxError(closeIndex, e.Message);

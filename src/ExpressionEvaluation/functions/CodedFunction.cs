@@ -1,36 +1,118 @@
 namespace JSONEval.ExpressionEvaluation;
+
+/// <summary>
+/// Function that requires execution of C# code to return it's desired results
+/// </summary>
 abstract class CodedFunction : FunctionDef
 {
+    /// <param name="p_paramInfo">Type information for each parameter</param>
+    /// <exception cref="System.ArgumentException">
+    /// Thrown if the number of parameters is less than 1.
+    /// </exception>
     public CodedFunction(params FxParamType[] p_paramInfo) : base(p_paramInfo) {}
 
-    // By the time the coded function call executes, we know:
-    // - That the number of parameters is correct
-    // - That the parameters are of the correct FxParamType
-    // What we don't know is:
-    // - If Primitive Parameters are of the expected type
-    public abstract PrimitiveOperand eval(Evaluator p, VarDictionary parms);
+    /// <summary>
+    /// Executes this function on a given set of parameters
+    /// </summary>
+    /// <param name="parms">
+    /// Variables representing the function call's arguments where:
+    /// - The number of argument groups matches the number required for this function
+    /// - Each argument is of the appropriate FxParamType
+    /// </param>
+    /// <returns>The PrimitiveOperand result of the function call</returns>
+    /// <exception cref="CodedFunctionException">
+    /// Thrown when the function call cannot return a result for
+    /// any predictable reason.
+    /// </exception>
+    /// <exception cref="ExpressionParsingException">
+    /// Thrown if an expression parameter cannot be resolved to an operand
+    /// for any predictable reason
+    /// </exception>
+    public abstract PrimitiveOperand eval(VarDictionary parms);
 }
 
+/// <summary>
+/// Conditional If/Else Function
+/// </summary>
 class CodedFunction_IfElse : CodedFunction
 {
+    /*
+    * Parameter #1 is the conditional statement, and must resolve to a BoolOperand
+    * Parameter #2 is the expression that gets evaluated *only if* the conditional resolves to 'true'
+    * Parameter #3 is the expression that gets evaluated *only if* the conditional resolves to 'false'
+    */
     public CodedFunction_IfElse() : base(
         FxParamType.PRIMITIVE, 
         FxParamType.EXPRESSION, 
         FxParamType.EXPRESSION
     ) {}
 
-    public override PrimitiveOperand eval(Evaluator p, VarDictionary parms)
+    public override PrimitiveOperand eval(VarDictionary parms)
     {
         switch(parms["!0"])
         {
             case BoolOperand conditionalResult:
                 if(conditionalResult.value)
-                    return p.evaluate((ExpressionOperand)parms["!1"]);
+                    return Evaluator.evaluate((ExpressionOperand)parms["!1"]);
                 else
-                    return p.evaluate((ExpressionOperand)parms["!2"]);
+                    return Evaluator.evaluate((ExpressionOperand)parms["!2"]);
             default:
                 throw new CodedFunctionException("The first parameter of an If function must resolve to a Boolean");
         }
+    }
+}
+
+/// <summary>
+/// Function equivalent to a limited for loop
+/// </summary>
+class CodedFunction_Loop : CodedFunction
+{
+    /*
+    * Parameter #1 is the initial integer incrementer value
+    * Parameter #2 is the cutoff value for the incrementer
+    * Parameter #3 is the expression that will be looped
+    * Parameter #4 is the initial value
+    */
+    public CodedFunction_Loop() : base (
+        FxParamType.PRIMITIVE,
+        FxParamType.PRIMITIVE,
+        FxParamType.EXPRESSION,
+        FxParamType.PRIMITIVE
+    ){}
+
+    public override PrimitiveOperand eval(VarDictionary parms)
+    {
+        IntOperand start;
+        IntOperand end;
+        ExpressionOperand loopingExp = (ExpressionOperand)parms["!2"];
+        PrimitiveOperand result = (PrimitiveOperand)parms["!3"];
+        string incVar = "!";
+
+        try
+        {
+            start = (IntOperand)parms["!0"];
+            end = (IntOperand)parms["!1"];
+        }
+        catch(System.InvalidCastException)
+        { 
+            throw new CodedFunctionException("The Loop function's first two parameters must resolve to Integers.");
+        }
+
+        while(true) // Allows for nested loops calls to properly function
+        {
+            incVar += 'i';
+            if(!loopingExp.localVars.ContainsKey(incVar))
+                break;
+        }
+
+        for(int i = start.value; i < end.value; i++)
+        {
+            loopingExp.localVars[incVar] = new IntOperand(i);
+            result = result.Add(Evaluator.evaluate(loopingExp));
+        }
+
+        loopingExp.localVars.Remove(incVar);
+        return result;
     }
 }
 
@@ -41,14 +123,14 @@ class CodedFunction_And : CodedFunction
         FxParamType.EXPRESSION
     ) {}
 
-    public override PrimitiveOperand eval(Evaluator p, VarDictionary parms)
+    public override PrimitiveOperand eval(VarDictionary parms)
     {
         try
         {
-            PrimitiveOperand leftResult = p.evaluate((ExpressionOperand)parms["!0"]);
+            PrimitiveOperand leftResult = Evaluator.evaluate((ExpressionOperand)parms["!0"]);
             if(((BoolOperand)leftResult).value)
             {
-                PrimitiveOperand rightResult = p.evaluate((ExpressionOperand)parms["!1"]);
+                PrimitiveOperand rightResult = Evaluator.evaluate((ExpressionOperand)parms["!1"]);
                 if(((BoolOperand)rightResult).value)
                     return BoolOperand.TRUE;
                 return BoolOperand.FALSE;
@@ -69,15 +151,15 @@ class CodedFunction_Or : CodedFunction
         FxParamType.EXPRESSION
     ) {}
 
-    public override PrimitiveOperand eval(Evaluator p, VarDictionary parms)
+    public override PrimitiveOperand eval(VarDictionary parms)
     {
         try
         {
-            PrimitiveOperand leftResult = p.evaluate((ExpressionOperand)parms["!0"]);
+            PrimitiveOperand leftResult = Evaluator.evaluate((ExpressionOperand)parms["!0"]);
             if (((BoolOperand)leftResult).value)
                 return BoolOperand.TRUE;
 
-            PrimitiveOperand rightResult = p.evaluate((ExpressionOperand)parms["!1"]);
+            PrimitiveOperand rightResult = Evaluator.evaluate((ExpressionOperand)parms["!1"]);
             if (((BoolOperand)rightResult).value)
                 return BoolOperand.TRUE;
             
@@ -96,7 +178,7 @@ class CodedFunction_IntCast : CodedFunction
         FxParamType.PRIMITIVE
     ){}
 
-    public override PrimitiveOperand eval(Evaluator p, VarDictionary parms)
+    public override PrimitiveOperand eval(VarDictionary parms)
     {
         switch(parms["!0"])
         {
@@ -112,9 +194,111 @@ class CodedFunction_IntCast : CodedFunction
             else
                 return new IntOperand(0);
             
-            default:  // CHECK IF STRING CONVERTS TO A NUMBER
-            throw new CodedFunctionException("Cannot convert this type to an IntOperand");
+            case StringOperand p4:
+            int res;
+            if(!Int32.TryParse(p4.value, out res))
+                throw new CodedFunctionException("This string cannot be converted to an IntOperand");
+            return new IntOperand(res);
+
+            default:
+            throw new CodedFunctionException("Unreachable");
         }
     }
 }
+
+class CodedFunction_DecimalCast : CodedFunction
+{
+    public CodedFunction_DecimalCast() : base (
+        FxParamType.PRIMITIVE
+    ){}
+
+    public override PrimitiveOperand eval(VarDictionary parms)
+    {
+        switch(parms["!0"])
+        {
+            case IntOperand p1:
+            return new DecimalOperand(p1.value);
+
+            case DecimalOperand p2:
+            return p2;
+
+            case BoolOperand p3:
+            if(p3.value)
+                return new DecimalOperand(1);
+            else
+                return new DecimalOperand(0);
+            
+            case StringOperand p4:
+            double res;
+            if(!Double.TryParse(p4.value, out res))
+                throw new CodedFunctionException("This string cannot be converted to a DecimalOperand");
+            return new DecimalOperand(res);
+
+            default:
+            throw new CodedFunctionException("Unreachable");
+        }
+    }
+}
+
+class CodedFunction_BoolCast : CodedFunction
+{
+    public CodedFunction_BoolCast() : base (
+        FxParamType.PRIMITIVE
+    ){}
+
+    public override PrimitiveOperand eval(VarDictionary parms)
+    {
+        switch(parms["!0"])
+        {
+            case IntOperand p1:
+            return BoolOperand.ToOperand(p1.value >= 1);
+
+            case DecimalOperand p2:
+            return BoolOperand.ToOperand(p2.value >= 1);
+
+            case BoolOperand p3:
+            return p3;
+
+            case StringOperand p4:
+            bool res;
+            if(!Boolean.TryParse(p4.value, out res))
+                throw new CodedFunctionException("This string cannot be converted to a BoolOperand");
+            return BoolOperand.ToOperand(res);
+
+            default:
+                throw new CodedFunctionException("Unreachable");
+        }
+    }
+}
+
+class CodedFunction_StringCast : CodedFunction
+{
+    public CodedFunction_StringCast() : base (
+        FxParamType.PRIMITIVE
+    ){}
+
+    public override PrimitiveOperand eval(VarDictionary parms)
+    {
+        string val = "";
+        switch(parms["!0"])
+        {
+            case IntOperand p1:
+            val = p1.value.ToString();
+            break;
+
+            case DecimalOperand p2:
+            val = p2.value.ToString();
+            break;
+
+            case BoolOperand p3:
+            val = p3.value.ToString();
+            break;
+
+            case StringOperand p4:
+            return p4;
+        }
+        return new StringOperand(val);
+    }
+}
+
 
