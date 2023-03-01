@@ -50,7 +50,7 @@ static class Evaluator
     /// <summary>
     /// Info for all available functions (user-defined and hard-coded)
     /// </summary>
-    public static FunctionHandler functions;
+    public static FunctionDictionary functions;
 
     /// <summary>
     /// Use this to load any standard variables and functions
@@ -62,7 +62,7 @@ static class Evaluator
         globalVars.AddBoolVar("true", true);
         globalVars.AddBoolVar("false", false);
 
-        functions = new FunctionHandler();
+        functions = new FunctionDictionary();
         functions.Add("if", new CodedFunction_IfElse());
         functions.Add("loop", new CodedFunction_Loop());
         functions.Add("and", new CodedFunction_And());
@@ -82,9 +82,9 @@ static class Evaluator
     /// Thrown if the expression cannot be resolved to an Operand for any
     /// predictable reason
     /// </exception>
-    public static string evaluate(string exp)
+    public static string Evaluate(string exp)
     {
-        PrimitiveOperand result = evaluate(new ExpressionOperand(exp));
+        PrimitiveOperand result = Evaluate(new ExpressionOperand(exp));
         return result.ToString();
     }
 
@@ -98,7 +98,7 @@ static class Evaluator
     /// Thrown if the expression cannot be resolved to an Operand for any
     /// predictable reason
     /// </exception>
-    public static PrimitiveOperand evaluate(ExpressionOperand exp, bool flag_reference=false)
+    public static PrimitiveOperand Evaluate(ExpressionOperand exp, bool flag_reference=false)
     {
         if(exp.value.Trim().Length == 0)
             throw SyntaxError(exp.value.Length, "The expression is empty.");
@@ -506,7 +506,7 @@ static class Evaluator
 
         PrimitiveOperand recursiveCall(ExpressionOperand r, bool setRefFlag=false)
         {
-            try { return evaluate(r, setRefFlag);}
+            try { return Evaluate(r, setRefFlag);}
             catch(ExpressionParsingException e)
             {
                 string fragment = exp.value.Substring(0, 

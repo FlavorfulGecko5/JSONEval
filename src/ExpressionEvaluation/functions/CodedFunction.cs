@@ -31,16 +31,12 @@ abstract class CodedFunction : FunctionDef
     public abstract PrimitiveOperand eval(VarDictionary parms);
 }
 
-/// <summary>
-/// Conditional If/Else Function
-/// </summary>
+/*
+* See documentation for information on all standard coded functions
+*/
+
 class CodedFunction_IfElse : CodedFunction
 {
-    /*
-    * Parameter #1 is the conditional statement, and must resolve to a BoolOperand
-    * Parameter #2 is the expression that gets evaluated *only if* the conditional resolves to 'true'
-    * Parameter #3 is the expression that gets evaluated *only if* the conditional resolves to 'false'
-    */
     public CodedFunction_IfElse() : base(
         FxParamType.PRIMITIVE, 
         FxParamType.EXPRESSION, 
@@ -53,26 +49,17 @@ class CodedFunction_IfElse : CodedFunction
         {
             case BoolOperand conditionalResult:
                 if(conditionalResult.value)
-                    return Evaluator.evaluate((ExpressionOperand)parms["!1"]);
+                    return Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
                 else
-                    return Evaluator.evaluate((ExpressionOperand)parms["!2"]);
+                    return Evaluator.Evaluate((ExpressionOperand)parms["!2"]);
             default:
                 throw new CodedFunctionException("The first parameter of an If function must resolve to a Boolean");
         }
     }
 }
 
-/// <summary>
-/// Function equivalent to a limited for loop
-/// </summary>
 class CodedFunction_Loop : CodedFunction
 {
-    /*
-    * Parameter #1 is the initial integer incrementer value
-    * Parameter #2 is the cutoff value for the incrementer
-    * Parameter #3 is the expression that will be looped
-    * Parameter #4 is the initial value
-    */
     public CodedFunction_Loop() : base (
         FxParamType.PRIMITIVE,
         FxParamType.PRIMITIVE,
@@ -108,7 +95,7 @@ class CodedFunction_Loop : CodedFunction
         for(int i = start.value; i < end.value; i++)
         {
             loopingExp.localVars[incVar] = new IntOperand(i);
-            result = result.Add(Evaluator.evaluate(loopingExp));
+            result = result.Add(Evaluator.Evaluate(loopingExp));
         }
 
         loopingExp.localVars.Remove(incVar);
@@ -127,10 +114,10 @@ class CodedFunction_And : CodedFunction
     {
         try
         {
-            PrimitiveOperand leftResult = Evaluator.evaluate((ExpressionOperand)parms["!0"]);
+            PrimitiveOperand leftResult = Evaluator.Evaluate((ExpressionOperand)parms["!0"]);
             if(((BoolOperand)leftResult).value)
             {
-                PrimitiveOperand rightResult = Evaluator.evaluate((ExpressionOperand)parms["!1"]);
+                PrimitiveOperand rightResult = Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
                 if(((BoolOperand)rightResult).value)
                     return BoolOperand.TRUE;
                 return BoolOperand.FALSE;
@@ -155,11 +142,11 @@ class CodedFunction_Or : CodedFunction
     {
         try
         {
-            PrimitiveOperand leftResult = Evaluator.evaluate((ExpressionOperand)parms["!0"]);
+            PrimitiveOperand leftResult = Evaluator.Evaluate((ExpressionOperand)parms["!0"]);
             if (((BoolOperand)leftResult).value)
                 return BoolOperand.TRUE;
 
-            PrimitiveOperand rightResult = Evaluator.evaluate((ExpressionOperand)parms["!1"]);
+            PrimitiveOperand rightResult = Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
             if (((BoolOperand)rightResult).value)
                 return BoolOperand.TRUE;
             
