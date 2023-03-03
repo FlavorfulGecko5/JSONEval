@@ -199,7 +199,7 @@ class ExpressionTests
 
         void assert(string exp, string expected)
         {
-            string result = Evaluator.Evaluate(exp);
+            string result = Evaluator.Evaluate(exp).ToString();
             if (!result.Equals(expected))
             {
                 Console.WriteLine("TEST FAILED:\nExpression: \"{0}\"\nExpected: \"{1}\"\nResult: \"{2}\"", exp, expected, result);

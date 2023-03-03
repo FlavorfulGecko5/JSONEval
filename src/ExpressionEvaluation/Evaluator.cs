@@ -77,15 +77,14 @@ static class Evaluator
     /// Fully evaluates a string expression
     /// </summary>
     /// <param name="exp">The expression to evaluate</param>
-    /// <returns>The string representation of the result</returns>
+    /// <returns>The result stored in the appropriate Operand object</returns>
     /// <exception cref="ExpressionParsingException">
     /// Thrown if the expression cannot be resolved to an Operand for any
     /// predictable reason
     /// </exception>
-    public static string Evaluate(string exp)
+    public static PrimitiveOperand Evaluate(string exp)
     {
-        PrimitiveOperand result = Evaluate(new ExpressionOperand(exp));
-        return result.ToString();
+        return Evaluate(new ExpressionOperand(exp));
     }
 
     /// <summary>
@@ -165,11 +164,6 @@ static class Evaluator
 
                     case OperandTokenType.NONE: case OperandTokenType.INTEGER:
                     activeType = OperandTokenType.DECIMAL;
-                    break;
-
-                    case OperandTokenType.VARIABLE:
-                    if(exp.value[inc-1] == '.')
-                        throw SyntaxError(inc, "Variable names cannot contain two consecutive periods."); 
                     break;
                 }
                 activeOperand += c;
