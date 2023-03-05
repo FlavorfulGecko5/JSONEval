@@ -63,16 +63,16 @@ class CodedFunction_Loop : CodedFunction
     public CodedFunction_Loop() : base (
         FxParamType.PRIMITIVE,
         FxParamType.PRIMITIVE,
-        FxParamType.EXPRESSION,
-        FxParamType.PRIMITIVE
+        FxParamType.PRIMITIVE,
+        FxParamType.EXPRESSION
     ){}
 
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         IntOperand start;
         IntOperand end;
-        ExpressionOperand loopingExp = (ExpressionOperand)parms["!2"];
-        PrimitiveOperand result = (PrimitiveOperand)parms["!3"];
+        PrimitiveOperand result = (PrimitiveOperand)parms["!2"];
+        ExpressionOperand loopingExp = (ExpressionOperand)parms["!3"];
         string incVar = "!";
 
         try
@@ -92,7 +92,7 @@ class CodedFunction_Loop : CodedFunction
                 break;
         }
 
-        for(int i = start.value; i < end.value; i++)
+        for(int i = start.value; i <= end.value; i++)
         {
             loopingExp.localVars[incVar] = new IntOperand(i);
             result = result.Add(Evaluator.Evaluate(loopingExp));

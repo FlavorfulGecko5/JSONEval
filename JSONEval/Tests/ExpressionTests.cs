@@ -189,10 +189,10 @@ class ExpressionTests
         assert("string(4.5)", "4.5");
         assert("string(true)", "True");
         assert("string(False)", "False");
-        assert("loop(0, 5, 1, 0)", "5");
-        assert("loop(0, 5, !i, 0)", "10");
-        assert("loop(2, 3, loop(3, 4, !ii * !i, 0), 0)", "6");
-        assert("loop(0, 3, 'hello ', '')", "hello hello hello ");
+        assert("loop(0, 4, 0, 1)", "5");
+        assert("loop(0, 4, 0, !i)", "10");
+        assert("loop(2, 2, 0, loop(3, 3, 0, !ii * !i))", "6");
+        assert("loop(0, 2, '', 'hello ')", "hello hello hello ");
 
         timer.Stop();
         Console.WriteLine("ALL TESTS SUCCEEDED (Time: {0} MS)", timer.ElapsedMilliseconds);
