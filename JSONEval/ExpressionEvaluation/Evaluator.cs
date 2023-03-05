@@ -91,13 +91,12 @@ static class Evaluator
     /// Fully evaluates an expression
     /// </summary>
     /// <param name="exp">The expression to evaluate</param>
-    /// <param name="flag_reference">If true, treat the expression as a reference parameter</param>
     /// <returns>The result stored in an appropriate operand object</returns>
     /// <exception cref="ExpressionParsingException">
     /// Thrown if the expression cannot be resolved to an Operand for any
     /// predictable reason
     /// </exception>
-    public static PrimitiveOperand Evaluate(ExpressionOperand exp, bool flag_reference=false)
+    public static PrimitiveOperand Evaluate(ExpressionOperand exp)
     {
         if(exp.value.Trim().Length == 0)
             throw SyntaxError(exp.value.Length, "The expression is empty.");
@@ -260,8 +259,6 @@ static class Evaluator
                 break;
 
                 case '(':
-                if (flag_reference && balanceChecker.Peek() == 'e')
-                    throw SyntaxError(inc, "Cannot pass a function call or expression as a reference parameter");
                 switch(activeType)
                 {
                     case OperandTokenType.VARIABLE:
@@ -437,18 +434,7 @@ static class Evaluator
             if(lastToken == TokenType.OPERAND)
                 throw SyntaxError(inc, "Cannot have two operands in a row - place an operator between them.");
 
-            if (flag_reference && balanceChecker.Peek() == 'e')
-            {
-                if(activeType != OperandTokenType.VARIABLE)
-                    throw SyntaxError(inc, "A reference parameter cannot be a literal value");
-                if(operators.Count > 0 || operands.Count > 0)
-                    throw SyntaxError(inc, "A reference parameter may only have bracketed expressions");
-                for(int k = inc; k < exp.value.Length; k++)
-                    if(!Char.IsWhiteSpace(exp.value[k]))
-                        throw SyntaxError(k, "A reference parameter must be a single variable name");
-                operands.Push(new StringOperand(activeOperand));
-            }
-            else switch(activeType)
+            switch(activeType)
             {
                 case OperandTokenType.INTEGER:
                     int tp1;
@@ -498,9 +484,9 @@ static class Evaluator
             activeType = OperandTokenType.NONE;
         }
 
-        PrimitiveOperand recursiveCall(ExpressionOperand r, bool setRefFlag=false)
+        PrimitiveOperand recursiveCall(ExpressionOperand r)
         {
-            try { return Evaluate(r, setRefFlag);}
+            try { return Evaluate(r);}
             catch(ExpressionParsingException e)
             {
                 string fragment = exp.value.Substring(0, 
@@ -610,9 +596,17 @@ static class Evaluator
                         callVariables.AddExpressionVar("!" + i, rawParms[i], exp.localVars);
                     break;
 
-                    case FxParamType.REFERENCE: // Allow for evaluation of bracket contents before checking for existence
-                        ExpressionOperand toRef = new ExpressionOperand(rawParms[i], exp.localVars);
-                        string refName = ((StringOperand)recursiveCall(toRef, true)).value;
+                    case FxParamType.REFERENCE:
+                        string refName;
+                        try 
+                        {
+                            ExpressionOperand toRef = new ExpressionOperand(rawParms[i], exp.localVars);
+                            refName = ((StringOperand)recursiveCall(toRef)).value;
+                        }
+                        catch(System.InvalidCastException) 
+                        {
+                            throw SyntaxError(closeIndex, "Reference parameter #" + (i + 1) + " must evaluate to a string");
+                        }
 
                         bool isLocal = exp.localVars.ContainsKey(refName);
                         bool isGlobal = globalVars.ContainsKey(refName);
