@@ -130,8 +130,8 @@ class ExpressionTests
         assert("1 + -~-1", "1");
 
         // Iteration #8 UserFunction with Primitive Parameter tests
-        Evaluator.functions.Add("funcA", new UserFunction("!0 + !1 + !2", FxParamType.PRIMITIVE, FxParamType.PRIMITIVE, FxParamType.PRIMITIVE));
-        Evaluator.functions.Add("delimtest", new UserFunction("!0", FxParamType.PRIMITIVE));
+        Evaluator.functions.Add("funcA", new ExpressionFunction("!0 + !1 + !2", FxParamType.PRIMITIVE, FxParamType.PRIMITIVE, FxParamType.PRIMITIVE));
+        Evaluator.functions.Add("delimtest", new ExpressionFunction("!0", FxParamType.PRIMITIVE));
         assert("funcA(   1 , 2  , 3 )", "6");
         assert("funcA(  'hello('  , 'door', '')"  , "hello(door");
         assert("DELIMTEST( ',()(`',,(`'`'),()(,,())' )", ",()(',,(''),()(,,())");
@@ -156,9 +156,9 @@ class ExpressionTests
         assert("int(false)", "0");
 
         // Iteration #10 Shadowing and Reference parameters
-        Evaluator.functions.Add("reftest", new UserFunction("reftestnested('!0', '!0.subname')", FxParamType.REFERENCE));
-        Evaluator.functions.Add("reftestnested", new UserFunction("!0 + !1", FxParamType.REFERENCE, FxParamType.REFERENCE));
-        Evaluator.functions.Add("refbracket", new UserFunction("!0[0]", FxParamType.REFERENCE));
+        Evaluator.functions.Add("reftest", new ExpressionFunction("reftestnested('!0', '!0.subname')", FxParamType.REFERENCE));
+        Evaluator.functions.Add("reftestnested", new ExpressionFunction("!0 + !1", FxParamType.REFERENCE, FxParamType.REFERENCE));
+        Evaluator.functions.Add("refbracket", new ExpressionFunction("!0[0]", FxParamType.REFERENCE));
         Evaluator.globalVars.AddIntVar("xyz", -123);
         Evaluator.globalVars.AddIntVar("xyz.subname", -340);
         Evaluator.globalVars.AddIntVar("xyz[0]", 34);

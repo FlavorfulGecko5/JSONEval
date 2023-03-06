@@ -635,7 +635,7 @@ static class Evaluator
             // STEP 3: EXECUTE THE FUNCTION CALL
             switch(functions[activeOperand])
             {
-                case UserFunction f1:
+                case ExpressionFunction f1:
                     ExpressionOperand toPrim = new ExpressionOperand(f1.expression, callVariables);
                     operands.Push(recursiveCall(toPrim));
                 break;

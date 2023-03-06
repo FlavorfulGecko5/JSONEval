@@ -2,7 +2,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Function defined as an expression
 /// </summary>
-class UserFunction : FunctionDef
+class ExpressionFunction : FunctionDef
 {
     /// <summary>
     /// The expression to be evaluated when this function is called
@@ -14,7 +14,7 @@ class UserFunction : FunctionDef
     /// <exception cref="System.ArgumentException">
     /// Thrown if the number of parameters is less than 1.
     /// </exception>
-    public UserFunction(string p_exp, params FxParamType[] p_paramInfo) : base(p_paramInfo)
+    public ExpressionFunction(string p_exp, params FxParamType[] p_paramInfo) : base(p_paramInfo)
     {
         expression = p_exp;
     }
