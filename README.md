@@ -25,7 +25,8 @@ Evaluate("some_boolean = true");   // Returns the Boolean 'True'
 Evaluate("x <= 4 | y > 200");      // Returns the Boolean 'False'
 
 // Strings can be utilized
-Evaluate(" stringVar + ' String concatenation ' + x "); // Returns the string "hello there String concatenation 5"
+// Returns the string "hello there String concatenation 5"
+Evaluate(" stringVar + ' String concatenation ' + x "); 
 
 // An adequate library of functions are present - and other custom functions are easily implemented:
 Evaluate("if(x ~= 0, 500 / x, 0)"); // returns 100
