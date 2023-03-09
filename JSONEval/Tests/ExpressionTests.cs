@@ -3,11 +3,6 @@ using JSONEval.ExpressionEvaluation;
 using System.Diagnostics;
 class ExpressionTests
 {
-    public static void Main(string[] args)
-    {
-        ExpressionTests.RunUnitTests();
-    }
-
     public static void RunUnitTests()
     {
         Stopwatch timer = new Stopwatch();
