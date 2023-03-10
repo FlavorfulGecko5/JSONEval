@@ -18,6 +18,11 @@ class Parser
 
     public void Parse(string rawJson)
     {
+        Parse(rawJson, new string[0]);
+    }
+
+    public List<JProperty> Parse(string rawJson, string[] reservedNames)
+    {
         preface = "";
 
         JObject parsedJson;
@@ -36,13 +41,82 @@ class Parser
 
 
         // TODO: Default String form interpretation
+        const string PROPERTY_STRINGEXP = "StringExpressions";
+        JToken? stringExpToken = parsedJson.GetValue(PROPERTY_STRINGEXP);
+        if(stringExpToken != null)
+        {
+            if(stringExpToken.Type != JTokenType.Boolean)
+                throw new Exception();
+            stringsAreExpressions = (bool)stringExpToken;
+        }
 
         // TODO: Parse Function definition property here
+        const string PROPERTY_FUNCTIONS = "Functions";
+        const string PROPERTY_FUNCTION_PARAMS = "Parameters";
+        const string PROPERTY_FUNCTION_EXP = "Definition";
+        JToken? fxToken = parsedJson.GetValue(PROPERTY_FUNCTIONS);
+        if(fxToken != null)
+        {
+            // Note: use preface system for error messages?
+            if(fxToken.Type != JTokenType.Object)
+                throw new Exception();
+            foreach(JProperty fxProp in fxToken)
+            {
+                if(fxProp.Type != JTokenType.Object)
+                    throw new Exception();
+                JObject fx = (JObject)fxProp.Value;
+
+                string[] paramList = {};
+                string[] definition = {};
+
+                if(!ParseStringList(fx.GetValue(PROPERTY_FUNCTION_PARAMS), ref paramList, false))
+                    throw new Exception();
+                
+                FxParamType[] parsedParams = new FxParamType[paramList.Length];
+                for(int i = 0; i < parsedParams.Length; i++)
+                    switch(paramList[i].ToUpper())
+                    {
+                        case "PRIMITIVE":
+                        parsedParams[i] = FxParamType.PRIMITIVE;
+                        break;
+
+                        case "EXPRESSION":
+                        parsedParams[i] = FxParamType.EXPRESSION;
+                        break;
+
+                        case "REFERENCE":
+                        parsedParams[i] = FxParamType.REFERENCE;
+                        break;
+
+                        default:
+                        throw new Exception();
+                    } 
+                
+                if(!ParseStringList(fx.GetValue(PROPERTY_FUNCTION_EXP), ref definition, true))
+                    throw new Exception();
+                
+                // Duplicate function name check needed
+                Evaluator.functions.Add(fxProp.Name, new ExpressionFunction(definition[0], parsedParams));
+            }
+        }
 
         // TODO: Extract reserved property list
         // Should allow any property (including properties reserved by function)
+        List<JProperty> reservedProps = new List<JProperty>();
+        foreach(string prop in reservedNames)
+        {
+            JProperty? p = parsedJson.Property(prop);
+            if(p != null)
+            {
+                reservedProps.Add(p);
+                parsedJson.Remove(prop);
+            }
+        }
 
+        parsedJson.Remove(PROPERTY_STRINGEXP);
+        parsedJson.Remove(PROPERTY_FUNCTIONS);
         objectParse(parsedJson);
+        return reservedProps;
     }
 
     private void objectParse(JObject obj)
@@ -84,7 +158,10 @@ class Parser
             break;
 
             case JTokenType.String:
-            vars.AddExpressionVar(fullName, token.ToString());
+            if(stringsAreExpressions)
+                vars.AddExpressionVar(fullName, token.ToString());
+            else
+                vars.AddStringVar(fullName, token.ToString());
             break;
 
             case JTokenType.Array:
