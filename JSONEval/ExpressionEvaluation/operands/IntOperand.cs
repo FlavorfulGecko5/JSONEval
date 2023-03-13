@@ -27,6 +27,20 @@ class IntOperand : PrimitiveOperand
     }
 
     /*
+    * Operand method implementations
+    */
+
+    public bool Equals(Operand b)
+    {
+        switch(b)
+        {
+            case IntOperand b1:
+            return value == b1.value;
+        }
+        return false;
+    }
+
+    /*
     * PrimitiveOperand method implementations
     */
 

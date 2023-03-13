@@ -35,4 +35,18 @@ class ExpressionOperand : Operand
         value = vParam;
         localVars = lvParam;
     }
+
+    /*
+    * Operand method implementations
+    */
+
+    public bool Equals(Operand b)
+    {
+        switch(b)
+        {
+            case ExpressionOperand b1:
+            return value.Equals(b1.value) && localVars.Equals(b1.localVars);
+        }
+        return false;
+    }
 }

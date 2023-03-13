@@ -18,4 +18,21 @@ class ExpressionFunction : FunctionDef
     {
         expression = p_exp;
     }
+
+    /// <summary>
+    /// Checks if two ExpressionFunctions are identical
+    /// </summary>
+    /// <param name="e">ExpressionFunction to compare with</param>
+    /// <returns>True if the functions are identical, otherwise false</returns>
+    public bool Equals(ExpressionFunction e)
+    {
+        if(expression != e.expression)
+            return false;
+        if(paramInfo.Length != e.paramInfo.Length)
+            return false;
+        for(int i = 0; i < paramInfo.Length; i++)
+            if(paramInfo[i] != e.paramInfo[i])
+                return false;
+        return true;
+    }
 }

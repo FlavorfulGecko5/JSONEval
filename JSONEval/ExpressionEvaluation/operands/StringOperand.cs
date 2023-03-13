@@ -33,6 +33,20 @@ class StringOperand : PrimitiveOperand
     }
 
     /*
+    * Operand method implementations
+    */
+
+    public bool Equals(Operand b)
+    {
+        switch(b)
+        {
+            case StringOperand b1:
+            return value.Equals(b1.value);
+        }
+        return false;
+    }
+
+    /*
     * PrimitiveOperand method implementations
     */
 

@@ -3,7 +3,15 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Any Operand useable in expressions
 /// </summary>
-interface Operand {}
+interface Operand 
+{
+    /// <summary>
+    /// Determines whether this Operand is equivalent to another Operand
+    /// </summary>
+    /// <param name="b">Operand to compare with</param>
+    /// <returns>True if the two Operands are equal, otherwise False</returns>
+    public bool Equals(Operand b);
+}
 
 /// <summary>
 /// An Operand useable by operators to produce another Operand

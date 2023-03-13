@@ -89,4 +89,20 @@ class VarDictionary : Dictionary<string, Operand>
     {
         Add(name, new ExpressionOperand(value, localVars));
     }
+
+    /// <summary>
+    /// Checks if two VarDictionaries have the same contents
+    /// </summary>
+    /// <param name="v">The dictionary to compare with</param>
+    /// <returns>True if the contents are equal, otherwise false</returns>
+    public bool Equals(VarDictionary v)
+    {
+        if(Count != v.Count)
+            return false;
+        
+        foreach(string key in Keys)
+            if(!v.ContainsKey(key) || !this[key].Equals(v[key]))
+                return false;
+        return true;
+    }
 }

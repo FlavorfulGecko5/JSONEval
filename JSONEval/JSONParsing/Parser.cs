@@ -34,19 +34,19 @@ class Parser
             };
             parsedJson = JObject.Parse(rawJson, reportExactDuplicates);
         }
-        catch(Newtonsoft.Json.JsonReaderException)
+        catch(Newtonsoft.Json.JsonReaderException e)
         {
-            throw new Exception();
+            throw new ParserException("Could not parse JSON:\n" + e.Message);
         }
 
 
-        // TODO: Default String form interpretation
+        // Set the default string form interpretation
         const string PROPERTY_STRINGEXP = "StringExpressions";
         JToken? stringExpToken = parsedJson.GetValue(PROPERTY_STRINGEXP);
         if(stringExpToken != null)
         {
             if(stringExpToken.Type != JTokenType.Boolean)
-                throw new Exception();
+                throw Error(PROPERTY_STRINGEXP, "This property must be defined as a Boolean, or left undefined");
             stringsAreExpressions = (bool)stringExpToken;
         }
 
@@ -57,24 +57,38 @@ class Parser
         JToken? fxToken = parsedJson.GetValue(PROPERTY_FUNCTIONS);
         if(fxToken != null)
         {
-            // Note: use preface system for error messages?
             if(fxToken.Type != JTokenType.Object)
-                throw new Exception();
+                throw Error(PROPERTY_FUNCTIONS, "This property must defined as an object, or left undefined");
+            
+            preface = PROPERTY_FUNCTIONS + '.';
+
             foreach(JProperty fxProp in fxToken)
             {
-                if(fxProp.Type != JTokenType.Object)
-                    throw new Exception();
+                // Validate function name
+                if(fxProp.Name.Length == 0)
+                    throw Error(fxProp.Name, "Function names cannot be empty");
+                foreach (char c in fxProp.Name)
+                    if (!(c <= 'z' && c >= 'a'))
+                    if (!(c <= 'Z' && c >= 'A'))
+                    if (!(c == '_'))
+                        throw Error(fxProp.Name, "Invalid character '" + c + "' in function name.");
+                if(Evaluator.functions.ContainsKey(fxProp.Name))
+                    throw Error(fxProp.Name, "A function with this name is already defined");
+
+                // Get function definition object
+                if(fxProp.Value.Type != JTokenType.Object)
+                    throw Error(fxProp.Name, "Function definitions must be objects");
                 JObject fx = (JObject)fxProp.Value;
 
+                // Extract parameter count and types
                 string[] paramList = {};
-                string[] definition = {};
-
                 if(!ParseStringList(fx.GetValue(PROPERTY_FUNCTION_PARAMS), ref paramList, false))
-                    throw new Exception();
-                
+                    throw Error(fxProp.Name, "Improper formatting of '" + PROPERTY_FUNCTION_PARAMS + "' property");
+                if(paramList.Length == 0)
+                    throw Error(fxProp.Name, "All functions must have at least one parameter");
                 FxParamType[] parsedParams = new FxParamType[paramList.Length];
                 for(int i = 0; i < parsedParams.Length; i++)
-                    switch(paramList[i].ToUpper())
+                    switch(paramList[i].Trim().ToUpper())
                     {
                         case "PRIMITIVE":
                         parsedParams[i] = FxParamType.PRIMITIVE;
@@ -89,19 +103,21 @@ class Parser
                         break;
 
                         default:
-                        throw new Exception();
-                    } 
-                
+                        throw Error(fxProp.Name, "Invalid parameter type '" + paramList[i] + "'");
+                    }
+
+                // Extract definition
+                string[] definition = { };
                 if(!ParseStringList(fx.GetValue(PROPERTY_FUNCTION_EXP), ref definition, true))
-                    throw new Exception();
+                    throw Error(fxProp.Name, "Improper formatting of '" + PROPERTY_FUNCTION_EXP + "' property");
                 
-                // Duplicate function name check needed
                 Evaluator.functions.Add(fxProp.Name, new ExpressionFunction(definition[0], parsedParams));
             }
+            preface = "";
         }
 
-        // TODO: Extract reserved property list
-        // Should allow any property (including properties reserved by function)
+        // Extract reserved property list
+        // Allows any property (including properties reserved by Parser)
         List<JProperty> reservedProps = new List<JProperty>();
         foreach(string prop in reservedNames)
         {
@@ -124,7 +140,7 @@ class Parser
         foreach(JProperty property in obj.Properties())
         {
             if(property.Name.Length == 0)
-                throw new Exception();
+                throw Error("", "Property names cannot be empty");
 
             if(property.Name[0] == '!') // Signal for comment properties
                 continue;
@@ -133,7 +149,7 @@ class Parser
                 if (!(c <= 'z' && c >= 'a'))
                 if (!(c <= 'Z' && c >= 'A'))
                 if (!(c == '_'))
-                    throw new Exception();
+                    throw Error(property.Name, "Invalid character '" + c + "' in property name.");
             
             TokenParse(property.Name, property.Value);
         }
@@ -143,7 +159,10 @@ class Parser
     {
         string fullName = preface + immediateName;
         string oldPreface = "";
-        switch (token.Type) // TODO: ADD TRY-CATCH FOR DUPLICATE VARIABLES (OR JUST DO IF-STATEMENT CHECK???)
+
+        if(vars.ContainsKey(fullName))
+            throw Error(immediateName, "This variable is already defined in the Parser's variable dictionary");
+        switch (token.Type)
         {
             case JTokenType.Integer:
             vars.AddIntVar(fullName, (int)token);
@@ -174,7 +193,7 @@ class Parser
             preface = oldPreface;
             break;
 
-            case JTokenType.Object: // Parse Type/Value here to eliminate conditional check
+            case JTokenType.Object:
             parseObjValue();
             oldPreface = preface;
             preface = fullName + '.';
@@ -183,7 +202,7 @@ class Parser
             break;
 
             default:
-                throw new Exception();
+                throw Error(immediateName, "The property's value is not a valid type");
         }
 
         void parseObjValue()
@@ -207,7 +226,7 @@ class Parser
                 return;
             }
             if(valueToken.Type == JTokenType.Object)
-                throw new Exception();
+                throw Error(immediateName, "An object's '" + PROPERTY_VALUE + "' property can't be an object.");
 
             // Check Type Token
             if(typeToken == null)
@@ -215,7 +234,7 @@ class Parser
             else if(typeToken.Type == JTokenType.String)
                 typeString = typeToken.ToString().ToUpper();
             else 
-                throw new Exception();
+                throw Error(immediateName, "An object's '" + PROPERTY_TYPE + "' property must be a string, or undefined");
             
             // Parse Value token according to Type string
             string[] valueList = {};
@@ -227,27 +246,30 @@ class Parser
 
                 case TYPESTRING_STRING:
                 if (!ParseStringList(valueToken, ref valueList, true))
-                    throw new Exception();
+                    throw Error(immediateName, "Improper definition of a '" + TYPESTRING_STRING+ "' type");
                 vars.AddStringVar(fullName, valueList[0]);
                 break;
 
                 case TYPESTRING_EXP:
                 if(!ParseStringList(valueToken, ref valueList, true))
-                    throw new Exception();
+                    throw Error(immediateName, "Improper definition of a '" + TYPESTRING_EXP + "' type");
                 vars.AddExpressionVar(fullName, valueList[0]);
                 break;
 
                 default:
-                    throw new Exception();
+                    throw Error(immediateName, typeString + " is an invalid type");
             }
             obj.Remove(PROPERTY_TYPE);
             obj.Remove(PROPERTY_VALUE);
         }
     }
 
-    private ParserException Error(string msg)
+    private ParserException Error(string immediateName, string msg)
     {
-        return new ParserException(msg);
+        string fullMessage = String.Format(
+            "Failed to parse property '{0}'\n{1}", preface + immediateName, msg
+        );
+        return new ParserException(fullMessage);
     }
 
     /// <summary>
