@@ -120,12 +120,6 @@ private static string jsonD =
     {
         {"keep", new IntOperand(900)}
     };
-
-
-    public static void Main(string[] args)
-    {
-        RunUnitTests();
-    }
     
     public static void RunUnitTests()
     {

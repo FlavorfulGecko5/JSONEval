@@ -37,9 +37,9 @@ Evaluator.functions.Add("multiply", new ExpressionFunction(
 ));
 ```
 ### Remarks:
-* Each property inside `Functions` is assumed to be a function definition
-* The name of the property becomes the name of the function
-* The `Parameters` property specifies the types of the parameters
-* The `Definition` property specifies the function expression
+* Each property inside `Functions` is assumed to be a function definition.
+* The name of the property becomes the name of the function.
+* The `Parameters` property specifies the types of the parameters.
+* The `Definition` property specifies the function expression.
 * Any properties besides `Parameters` and `Definition` are ignored.
 * No variables are created when parsing the `Functions` property.

@@ -8,7 +8,7 @@ The `Parser` is defined at `JSONEval/JSONParsing/Parser.cs` and for each usage i
 1. Parse raw JSON data from a string.
 2. Convert the JSON's properties into variables, storing them in it's referenced `VarDictionary`
 3. Create `ExpressionFunction` instances from function definition properties, adding them to the Evaluator's `FunctionDictionary`
-4. Return a list of unprocessed JSON properties reserved by the user, if they exist.
+4. Return a dictionary of unprocessed JSON properties reserved by the user, if they exist.
 
 This sample program showcases how to setup and use a `Parser`
 
