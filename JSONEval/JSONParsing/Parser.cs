@@ -1,6 +1,10 @@
 namespace JSONEval.JSONParsing;
 using JSONEval.ExpressionEvaluation;
 using Newtonsoft.Json.Linq;
+
+/// <summary>
+/// Parses JSON data into variables and functions for the Expression Evaluator
+/// </summary>
 class Parser
 {
     /// <summary>
@@ -12,16 +16,28 @@ class Parser
     /// If true, interpret JSON string properties as expressions by default.
     /// If false, interpret them as string literals
     /// </summary>
-    public bool stringsAreExpressions {get; set;} = true;
+    public bool StringExpressions {get; set;} = true;
 
+    /// <summary>
+    /// Tracks nested property names
+    /// </summary>
     private string preface = "";
 
-    public void Parse(string rawJson)
-    {
-        Parse(rawJson, new string[0]);
-    }
-
-    public List<JProperty> Parse(string rawJson, string[] reservedNames)
+    /// <summary>
+    /// Parses JSON data into variables and functions
+    /// </summary>
+    /// <param name="rawJson">JSON data to parse</param>
+    /// <param name="reservedNames">
+    /// Names of JSON Properties to extract and return to the user
+    /// instead of parsing into variables.
+    /// </param>
+    /// <returns>
+    /// Dictionary containing any reserved properties found in the JSON data
+    /// </returns>
+    /// <throws cref="ParserException">
+    /// Parsing the JSON fails for any predictable reason.
+    /// </throws>
+    public Dictionary<string, JToken> Parse(string rawJson, params string[] reservedNames)
     {
         preface = "";
 
@@ -47,10 +63,10 @@ class Parser
         {
             if(stringExpToken.Type != JTokenType.Boolean)
                 throw Error(PROPERTY_STRINGEXP, "This property must be defined as a Boolean, or left undefined");
-            stringsAreExpressions = (bool)stringExpToken;
+            StringExpressions = (bool)stringExpToken;
         }
 
-        // TODO: Parse Function definition property here
+        // Parse Function definition property
         const string PROPERTY_FUNCTIONS = "Functions";
         const string PROPERTY_FUNCTION_PARAMS = "Parameters";
         const string PROPERTY_FUNCTION_EXP = "Definition";
@@ -118,14 +134,14 @@ class Parser
 
         // Extract reserved property list
         // Allows any property (including properties reserved by Parser)
-        List<JProperty> reservedProps = new List<JProperty>();
-        foreach(string prop in reservedNames)
+        Dictionary<string, JToken> reservedProps = new Dictionary<string, JToken>();
+        foreach(string propName in reservedNames)
         {
-            JProperty? p = parsedJson.Property(prop);
+            JProperty? p = parsedJson.Property(propName);
             if(p != null)
             {
-                reservedProps.Add(p);
-                parsedJson.Remove(prop);
+                reservedProps.Add(propName, p.Value);
+                parsedJson.Remove(propName);
             }
         }
 
@@ -177,7 +193,7 @@ class Parser
             break;
 
             case JTokenType.String:
-            if(stringsAreExpressions)
+            if(StringExpressions)
                 vars.AddExpressionVar(fullName, token.ToString());
             else
                 vars.AddStringVar(fullName, token.ToString());
@@ -277,7 +293,7 @@ class Parser
     /// </summary>
     /// <param name="token">Token containing the primitive data</param>
     /// <param name="writeTo">
-    /// List to set equal to the data if reading is successful
+    /// List to set equal to the data if reading succeeds
     /// </param>
     /// <param name="aggregate">
     /// If true, concatenate all list values into one element
@@ -286,7 +302,7 @@ class Parser
     /// True if reading is successful
     /// False if parsing fails due to invalid data structuring
     /// </returns>
-    private static bool ParseStringList(JToken? token, ref string[] writeTo, bool aggregate)
+    public static bool ParseStringList(JToken? token, ref string[] writeTo, bool aggregate)
     {
         if (token == null)
             return false;
@@ -331,9 +347,4 @@ class Parser
             return false;
         }
     }
-}
-
-class ParserException : Exception
-{
-    public ParserException(string msg) : base(msg) {}
 }

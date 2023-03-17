@@ -44,6 +44,10 @@ class ParserTests
             $Type$: $expression$,
             $Value$: [3, 2]
         }
+    },
+
+    $novalue$: {
+
     }
 }
 ".Replace('$', '"');
@@ -65,7 +69,9 @@ class ParserTests
         {"obj_list.extra", new IntOperand(1)}, {"obj_list.extra[0]", new IntOperand(5)},
 
         {"typetesting", new IntOperand(9)}, {"typetesting.stype", new StringOperand("True yo")},
-        {"typetesting.etype", new ExpressionOperand("32")}
+        {"typetesting.etype", new ExpressionOperand("32")},
+
+        {"novalue", new StringOperand("UNDEFINED")}
     };
 
     private static string jsonB =
