@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Base class for defining functions useable in expressions
 /// </summary>
-abstract class FunctionDef
+public abstract class FunctionDef
 {
     /// <summary>
     /// Details each parameter's type.
@@ -50,7 +50,7 @@ abstract class FunctionDef
 /// <summary>
 /// Used to specify the types of function parameters
 /// </summary>
-enum FxParamType
+public enum FxParamType
 {
     /// <summary>
     /// The parameter should be evaluated and resolved to a PrimitiveOperand

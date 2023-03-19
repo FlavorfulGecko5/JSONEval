@@ -26,7 +26,7 @@ using Newtonsoft.Json.Linq;
 /// <summary>
 /// Parses JSON data into variables and functions for the Expression Evaluator
 /// </summary>
-class Parser
+public class Parser
 {
     /// <summary>
     /// Parsed variables are saved to this dictionary

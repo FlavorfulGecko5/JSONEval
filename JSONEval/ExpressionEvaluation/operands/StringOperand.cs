@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// An Operand representing a string value
 /// </summary>
-class StringOperand : PrimitiveOperand
+public class StringOperand : PrimitiveOperand
 {
     /// <summary>
     /// The Operand's string value

@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Any Operand useable in expressions
 /// </summary>
-interface Operand 
+public interface Operand 
 {
     /// <summary>
     /// Determines whether this Operand is equivalent to another Operand
@@ -37,7 +37,7 @@ interface Operand
 /// <summary>
 /// An Operand useable by operators to produce another Operand
 /// </summary>
-interface PrimitiveOperand : Operand
+public interface PrimitiveOperand : Operand
 {
     /// <returns>The string representation of the Operand's value</returns>
     public string ToString();

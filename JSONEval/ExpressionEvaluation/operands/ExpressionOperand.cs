@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// An Operand representing a complete expression
 /// </summary>
-class ExpressionOperand : Operand
+public class ExpressionOperand : Operand
 {
     /// <summary>
     /// The expression stored by this operand

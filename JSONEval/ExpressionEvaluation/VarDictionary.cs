@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Stores expression variable names and values
 /// </summary>
-class VarDictionary : Dictionary<string, Operand>
+public class VarDictionary : Dictionary<string, Operand>
 {
     /// <summary>
     /// Variable Dictionary Constructor

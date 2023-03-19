@@ -22,7 +22,7 @@ SOFTWARE.
 namespace JSONEval.Tests;
 using JSONEval.ExpressionEvaluation;
 using System.Diagnostics;
-class ExpressionTests
+public class ExpressionTests
 {
     public static void RunUnitTests()
     {

@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// An Operand representing a Boolean value
 /// </summary>
-class BoolOperand : PrimitiveOperand
+public class BoolOperand : PrimitiveOperand
 {
     /// <summary>
     /// BoolOperand representing 'True'

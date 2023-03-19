@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Function that requires execution of C# code to return it's desired results
 /// </summary>
-abstract class CodedFunction : FunctionDef
+public abstract class CodedFunction : FunctionDef
 {
     /// <param name="p_paramInfo">Type information for each parameter</param>
     /// <exception cref="System.ArgumentException">
@@ -56,7 +56,7 @@ abstract class CodedFunction : FunctionDef
 * See documentation for information on all standard coded functions
 */
 
-class CodedFunction_IfElse : CodedFunction
+public class CodedFunction_IfElse : CodedFunction
 {
     public CodedFunction_IfElse() : base(
         FxParamType.PRIMITIVE, 
@@ -79,7 +79,7 @@ class CodedFunction_IfElse : CodedFunction
     }
 }
 
-class CodedFunction_Loop : CodedFunction
+public class CodedFunction_Loop : CodedFunction
 {
     public CodedFunction_Loop() : base (
         FxParamType.PRIMITIVE,
@@ -124,7 +124,7 @@ class CodedFunction_Loop : CodedFunction
     }
 }
 
-class CodedFunction_And : CodedFunction
+public class CodedFunction_And : CodedFunction
 {
     public CodedFunction_And() : base (
         FxParamType.EXPRESSION,
@@ -152,7 +152,7 @@ class CodedFunction_And : CodedFunction
     }
 }
 
-class CodedFunction_Or : CodedFunction
+public class CodedFunction_Or : CodedFunction
 {
     public CodedFunction_Or() : base(
         FxParamType.EXPRESSION,
@@ -180,7 +180,7 @@ class CodedFunction_Or : CodedFunction
     }
 }
 
-class CodedFunction_IntCast : CodedFunction
+public class CodedFunction_IntCast : CodedFunction
 {
     public CodedFunction_IntCast() : base (
         FxParamType.PRIMITIVE
@@ -214,7 +214,7 @@ class CodedFunction_IntCast : CodedFunction
     }
 }
 
-class CodedFunction_DecimalCast : CodedFunction
+public class CodedFunction_DecimalCast : CodedFunction
 {
     public CodedFunction_DecimalCast() : base (
         FxParamType.PRIMITIVE
@@ -248,7 +248,7 @@ class CodedFunction_DecimalCast : CodedFunction
     }
 }
 
-class CodedFunction_BoolCast : CodedFunction
+public class CodedFunction_BoolCast : CodedFunction
 {
     public CodedFunction_BoolCast() : base (
         FxParamType.PRIMITIVE
@@ -279,7 +279,7 @@ class CodedFunction_BoolCast : CodedFunction
     }
 }
 
-class CodedFunction_StringCast : CodedFunction
+public class CodedFunction_StringCast : CodedFunction
 {
     public CodedFunction_StringCast() : base (
         FxParamType.PRIMITIVE

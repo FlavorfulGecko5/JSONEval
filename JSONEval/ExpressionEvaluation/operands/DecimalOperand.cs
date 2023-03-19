@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// An Operand representing a decimal (floating-point) value
 /// </summary>
-class DecimalOperand : PrimitiveOperand
+public class DecimalOperand : PrimitiveOperand
 {
     /// <summary>
     /// The Operand's decimal value

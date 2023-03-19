@@ -24,7 +24,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// An Operand representing a standard integer value
 /// </summary>
-class IntOperand : PrimitiveOperand
+public class IntOperand : PrimitiveOperand
 {
     /// <summary>
     /// The Operand's integer value

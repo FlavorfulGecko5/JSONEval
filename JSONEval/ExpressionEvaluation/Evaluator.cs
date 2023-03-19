@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 namespace JSONEval.ExpressionEvaluation;
-static class Evaluator
+public static class Evaluator
 {
     enum TokenType
     {

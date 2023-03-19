@@ -23,7 +23,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Function defined as an expression
 /// </summary>
-class ExpressionFunction : FunctionDef
+public class ExpressionFunction : FunctionDef
 {
     /// <summary>
     /// The expression to be evaluated when this function is called

@@ -23,7 +23,7 @@ namespace JSONEval.Tests;
 using JSONEval.JSONParsing;
 using JSONEval.ExpressionEvaluation;
 
-class ParserTests
+public class ParserTests
 {
     private static string jsonA =
 @"
