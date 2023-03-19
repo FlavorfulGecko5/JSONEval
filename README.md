@@ -1,6 +1,14 @@
 # JSONEval
 A .Net C# library that parses JSON files for variables and uses them to dynamically evaluate expressions from strings. The libary's expression evaluation component can be fully utilized without the JSON parser.
 
+JSONEval is available on Nuget:
+https://www.nuget.org/packages/FG5.JSONEval/
+
+## Dependencies
+* The Expression Evaluator is built entirely from scratch, with no third-party libraries or dependencies
+* The JSON Parser utilizes [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/#readme-body-tab)
+* JSONEval is built on .Net 6.0. In all likelihood, it is compatible with many older versions of .Net
+
 ## Show Me
 Want to see if this library suits your needs without reading a small book? Look no further!
 
@@ -143,19 +151,4 @@ The following example show a JSON file and lists what variables are generated wh
 | nested[2] | Integer | 5 |
 | nested[2].xyz | Integer | 95 |
 
-
 See the documentation for a breakdown on all the JSON parser's features and nuances.
-
-## Dependencies
-* The Expression Evaluator is built entirely from scratch, with no third-party libraries or dependencies
-* The JSON Parser utilizes [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/#readme-body-tab)
-* JSONEval is built on .Net 6.0. In all likelihood, it is compatible with many older versions of .Net
-
-## Installation
-JSONEval currently requires manual installation by downloading the files from GitHub.
-* If you are only interested in the Expression Evaluator, download the contents of `JSONEval/ExpressionEvaluation/`
-* If you are interested in the Expression Evaluator and JSON Parser, download the contents of `JSONEval/ExpressionEvaluation` AND `JSONEval/JSONParsing`
-    * Newtonsoft.Json must also be installed (see the above "Dependencies" section)
-* `JSONEval/Tests` contains test classes for both parts of the library you may find helpful.
-
-JSONEval is currently NOT published as a DLL or available anywhere for automatic installation.
