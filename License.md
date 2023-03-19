@@ -1,4 +1,5 @@
-/*
+MIT License
+
 Copyright (c) 2023 FlavorfulGecko5
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,14 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-namespace JSONEval.JSONParsing;
-
-/// <summary>
-/// Intended to be thrown by the JSON Parser when parsing fails for any
-/// predictable reason
-/// </summary>
-class ParserException : Exception
-{
-    public ParserException(string msg) : base(msg) { }
-}
