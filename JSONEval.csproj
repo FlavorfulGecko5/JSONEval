@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageID>FG5.JSONEval</PackageID>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>FlavorfulGecko5</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>License.md</PackageLicenseFile>
