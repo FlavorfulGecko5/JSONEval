@@ -61,6 +61,7 @@ public class ExpressionOperand : Operand
     * Operand method implementations
     */
 
+    /// <inheritdoc/>
     public bool Equals(Operand b)
     {
         switch(b)

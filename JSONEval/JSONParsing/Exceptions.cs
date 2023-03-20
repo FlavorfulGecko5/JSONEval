@@ -27,5 +27,6 @@ namespace JSONEval.JSONParsing;
 /// </summary>
 public class ParserException : Exception
 {
+    /// <param name="msg">Exception message</param>
     public ParserException(string msg) : base(msg) { }
 }

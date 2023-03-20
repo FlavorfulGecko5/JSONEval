@@ -51,6 +51,7 @@ public class IntOperand : PrimitiveOperand
     * Operand method implementations
     */
 
+    /// <inheritdoc/>
     public bool Equals(Operand b)
     {
         switch(b)
@@ -65,11 +66,13 @@ public class IntOperand : PrimitiveOperand
     * PrimitiveOperand method implementations
     */
 
+    /// <inheritdoc/>
     public override string ToString()
     {
         return value.ToString();
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
@@ -85,11 +88,13 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand UnaryAdd()
     {
         return this;
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Sub(PrimitiveOperand b)
     {
         switch (b)
@@ -103,11 +108,13 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand UnarySub()
     {
         return new IntOperand(value * -1);
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Mult(PrimitiveOperand b)
     {
         switch (b)
@@ -121,6 +128,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Div(PrimitiveOperand b)
     {
         switch (b)
@@ -136,6 +144,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         switch (b)
@@ -151,6 +160,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand And(PrimitiveOperand b)
     {
         switch (b)
@@ -161,6 +171,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Or(PrimitiveOperand b)
     {
         switch (b)
@@ -171,11 +182,13 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Not()
     {
         return new IntOperand(~value);
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Equal(PrimitiveOperand b)
     {
         switch (b)
@@ -187,6 +200,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand NotEqual(PrimitiveOperand b)
     {
         switch (b)
@@ -198,6 +212,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand LessThan(PrimitiveOperand b)
     {
         switch (b)
@@ -209,6 +224,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
     {
         switch (b)
@@ -220,6 +236,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand GreaterThan(PrimitiveOperand b)
     {
         switch (b)
@@ -231,6 +248,7 @@ public class IntOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
     {
         switch (b)

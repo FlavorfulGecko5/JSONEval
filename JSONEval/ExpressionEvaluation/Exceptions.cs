@@ -27,6 +27,7 @@ namespace JSONEval.ExpressionEvaluation;
 /// </summary>
 public class ExpressionParsingException : Exception
 {
+    /// <param name="msg">Exception message</param>
     public ExpressionParsingException(string msg) : base(msg) {}
 }
 
@@ -36,6 +37,7 @@ public class ExpressionParsingException : Exception
 /// </summary>
 public class OperatorEvaluationException : Exception
 {
+    /// <param name="msg">Exception message</param>
     public OperatorEvaluationException(string msg) : base(msg) {}
 }
 
@@ -45,5 +47,6 @@ public class OperatorEvaluationException : Exception
 /// </summary>
 public class CodedFunctionException : Exception
 {
+    /// <param name="msg">Exception message</param>
     public CodedFunctionException(string msg) : base(msg) {}
 }

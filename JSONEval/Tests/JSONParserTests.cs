@@ -23,6 +23,9 @@ namespace JSONEval.Tests;
 using JSONEval.JSONParsing;
 using JSONEval.ExpressionEvaluation;
 
+/// <summary>
+/// Test class for Parser Systems
+/// </summary>
 public class ParserTests
 {
     private static string jsonA =
@@ -142,6 +145,10 @@ private static string jsonD =
         {"keep", new IntOperand(900)}
     };
     
+    /// <summary>
+    /// Parses a series of JSON files, comparing their actual results with the
+    /// expected results
+    /// </summary>
     public static void RunUnitTests()
     {
         // Variable Parsing Tests

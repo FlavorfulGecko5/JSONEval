@@ -57,6 +57,7 @@ public class DecimalOperand : PrimitiveOperand
     * Operand method implementations
     */
 
+    /// <inheritdoc/>
     public bool Equals(Operand b)
     {
         switch (b)
@@ -71,11 +72,13 @@ public class DecimalOperand : PrimitiveOperand
     * PrimitiveOperand method implementations
     */
 
+    /// <inheritdoc/>
     public override string ToString()
     {
         return value.ToString();
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
@@ -91,11 +94,13 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand UnaryAdd()
     {
         return this;
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Sub(PrimitiveOperand b)
     {
         switch (b)
@@ -109,11 +114,13 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand UnarySub()
     {
         return new DecimalOperand(value * -1);
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Mult(PrimitiveOperand b)
     {
         switch (b)
@@ -127,6 +134,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Div(PrimitiveOperand b)
     {
         switch (b)
@@ -140,6 +148,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         switch (b)
@@ -153,21 +162,25 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand And(PrimitiveOperand b)
     {
         throw GenerateError("bitwise/logical and operations");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Or(PrimitiveOperand b)
     {
         throw GenerateError("bitwise/logical or operations");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Not()
     {
         throw GenerateError("bitwise/logical not operations");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Equal(PrimitiveOperand b)
     {
         switch (b)
@@ -179,6 +192,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand NotEqual(PrimitiveOperand b)
     {
         switch (b)
@@ -190,6 +204,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand LessThan(PrimitiveOperand b)
     {
         switch (b)
@@ -201,6 +216,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
     {
         switch (b)
@@ -212,6 +228,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand GreaterThan(PrimitiveOperand b)
     {
         switch (b)
@@ -223,6 +240,7 @@ public class DecimalOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
     {
         switch (b)

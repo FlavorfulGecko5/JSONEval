@@ -56,14 +56,19 @@ public abstract class CodedFunction : FunctionDef
 * See documentation for information on all standard coded functions
 */
 
+/// <summary>
+/// Conditional If/Else Coded Function
+/// </summary>
 public class CodedFunction_IfElse : CodedFunction
 {
+    ///
     public CodedFunction_IfElse() : base(
         FxParamType.PRIMITIVE, 
         FxParamType.EXPRESSION, 
         FxParamType.EXPRESSION
     ) {}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         switch(parms["!0"])
@@ -79,8 +84,12 @@ public class CodedFunction_IfElse : CodedFunction
     }
 }
 
+/// <summary>
+/// Restricted For Loop Coded Function
+/// </summary>
 public class CodedFunction_Loop : CodedFunction
 {
+    ///
     public CodedFunction_Loop() : base (
         FxParamType.PRIMITIVE,
         FxParamType.PRIMITIVE,
@@ -88,6 +97,7 @@ public class CodedFunction_Loop : CodedFunction
         FxParamType.EXPRESSION
     ){}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         IntOperand start;
@@ -124,13 +134,18 @@ public class CodedFunction_Loop : CodedFunction
     }
 }
 
+/// <summary>
+/// Short-Circuiting Logical AND Coded Function
+/// </summary>
 public class CodedFunction_And : CodedFunction
 {
+    ///
     public CodedFunction_And() : base (
         FxParamType.EXPRESSION,
         FxParamType.EXPRESSION
     ) {}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         try
@@ -152,13 +167,18 @@ public class CodedFunction_And : CodedFunction
     }
 }
 
+/// <summary>
+/// Short-Circuiting Logical OR Coded Function
+/// </summary>
 public class CodedFunction_Or : CodedFunction
 {
+    ///
     public CodedFunction_Or() : base(
         FxParamType.EXPRESSION,
         FxParamType.EXPRESSION
     ) {}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         try
@@ -180,12 +200,17 @@ public class CodedFunction_Or : CodedFunction
     }
 }
 
+/// <summary>
+/// Integer Casting Coded Function
+/// </summary>
 public class CodedFunction_IntCast : CodedFunction
 {
+    ///
     public CodedFunction_IntCast() : base (
         FxParamType.PRIMITIVE
     ){}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         switch(parms["!0"])
@@ -214,12 +239,17 @@ public class CodedFunction_IntCast : CodedFunction
     }
 }
 
+/// <summary>
+/// Decimal Casting Coded Function
+/// </summary>
 public class CodedFunction_DecimalCast : CodedFunction
 {
+    ///
     public CodedFunction_DecimalCast() : base (
         FxParamType.PRIMITIVE
     ){}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         switch(parms["!0"])
@@ -248,12 +278,17 @@ public class CodedFunction_DecimalCast : CodedFunction
     }
 }
 
+/// <summary>
+/// Boolean Casting Coded Function
+/// </summary>
 public class CodedFunction_BoolCast : CodedFunction
 {
+    ///
     public CodedFunction_BoolCast() : base (
         FxParamType.PRIMITIVE
     ){}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         switch(parms["!0"])
@@ -279,12 +314,17 @@ public class CodedFunction_BoolCast : CodedFunction
     }
 }
 
+/// <summary>
+/// String Casting Coded Function
+/// </summary>
 public class CodedFunction_StringCast : CodedFunction
 {
+    ///
     public CodedFunction_StringCast() : base (
         FxParamType.PRIMITIVE
     ){}
 
+    /// <inheritdoc/>
     public override PrimitiveOperand eval(VarDictionary parms)
     {
         string val = "";

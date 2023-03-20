@@ -78,6 +78,7 @@ public class BoolOperand : PrimitiveOperand
     * Operand method implementations
     */
 
+    /// <inheritdoc/>
     public bool Equals(Operand b)
     {
         switch(b)
@@ -91,12 +92,14 @@ public class BoolOperand : PrimitiveOperand
     /*
     * PrimitiveOperand method implementations
     */
-    
+
+    /// <inheritdoc/>  
     public override string ToString()
     {
         return value.ToString();
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
@@ -108,36 +111,43 @@ public class BoolOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand UnaryAdd()
     {
         throw GenerateError("unary addition");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Sub(PrimitiveOperand b)
     {
         throw GenerateError("subtraction");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand UnarySub()
     {
         throw GenerateError("unary subtraction");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Mult(PrimitiveOperand b)
     {
         throw GenerateError("multiplication");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Div(PrimitiveOperand b)
     {
         throw GenerateError("division");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Rem(PrimitiveOperand b)
     {
         throw GenerateError("remainder operations");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand And(PrimitiveOperand b)
     {
         switch (b)
@@ -148,6 +158,7 @@ public class BoolOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Or(PrimitiveOperand b)
     {
         switch (b)
@@ -158,11 +169,13 @@ public class BoolOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Not()
     {
         return ToOperand(!value);
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand Equal(PrimitiveOperand b)
     {
         switch (b)
@@ -173,6 +186,7 @@ public class BoolOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand NotEqual(PrimitiveOperand b)
     {
         switch (b)
@@ -183,21 +197,25 @@ public class BoolOperand : PrimitiveOperand
         }
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand LessThan(PrimitiveOperand b)
     {
         throw GenerateError("less-than comparisons");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
     {
         throw GenerateError("less-than-equal comparisons");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand GreaterThan(PrimitiveOperand b)
     {
         throw GenerateError("greater-than comparisons");
     }
 
+    /// <inheritdoc/>
     public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
     {
         throw GenerateError("greater-than-equal comparisons");

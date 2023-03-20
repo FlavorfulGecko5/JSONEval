@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <PackageID>FG5.JSONEval</PackageID>
+    <Version>1.0.3</Version>
+    <Authors>FlavorfulGecko5</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>License.md</PackageLicenseFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <None Include="README.md" Pack="true" PackagePath="README.md"/>
+    <None Include="License.md" Pack="true" PackagePath="License.md"/>
+  </ItemGroup>
+
+</Project>

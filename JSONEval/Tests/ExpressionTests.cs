@@ -22,8 +22,16 @@ SOFTWARE.
 namespace JSONEval.Tests;
 using JSONEval.ExpressionEvaluation;
 using System.Diagnostics;
+
+/// <summary>
+/// Test class for the ExpressionEvaluation systems.
+/// </summary>
 public class ExpressionTests
 {
+    /// <summary>
+    /// Evaluates a series of expressions, comparing the actual result
+    /// with the expected result.
+    /// </summary>
     public static void RunUnitTests()
     {
         Stopwatch timer = new Stopwatch();

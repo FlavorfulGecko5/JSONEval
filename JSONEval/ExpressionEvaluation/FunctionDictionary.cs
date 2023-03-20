@@ -26,5 +26,8 @@ namespace JSONEval.ExpressionEvaluation;
 /// </summary>
 public class FunctionDictionary : Dictionary<string, FunctionDef>
 {
+    /// <summary>
+    /// Creates a new FunctionDictionary with case-insensitive name lookups
+    /// </summary>
     public FunctionDictionary() : base(StringComparer.OrdinalIgnoreCase) {}
 }

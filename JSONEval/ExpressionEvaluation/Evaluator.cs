@@ -20,6 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 namespace JSONEval.ExpressionEvaluation;
+
+/// <summary>
+/// Performs all steps of the expression evaluation process
+/// </summary>
 public static class Evaluator
 {
     enum TokenType
