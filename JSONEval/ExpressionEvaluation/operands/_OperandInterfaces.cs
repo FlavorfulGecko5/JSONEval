@@ -39,8 +39,11 @@ public interface Operand
 /// </summary>
 public interface PrimitiveOperand : Operand
 {
-    /// <returns>The string representation of the Operand's value</returns>
-    public string ToString();
+    /// <summary>
+    /// Gets the string representation of this PrimitiveOperand's value
+    /// </summary>
+    /// <returns>The string representation of the PrimitiveOperand's value</returns>
+    public string GetValueString();
 
     /// <summary>
     /// Performs addition using this operand.

@@ -73,7 +73,7 @@ public class DecimalOperand : PrimitiveOperand
     */
 
     /// <inheritdoc/>
-    public override string ToString()
+    public string GetValueString()
     {
         return value.ToString();
     }

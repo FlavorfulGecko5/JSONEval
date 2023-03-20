@@ -44,7 +44,7 @@ Evaluate("string(x)"); // returns the string "5"
 
 // How to use the result of an expression?
 // Method 1: Convert the result to a string
-string resultString = Evaluate("x + y").ToString();
+string resultString = Evaluate("x + y").GetValueString();
 
 // Method 2: Use the raw data type
 switch(Evaluate("x + y"))

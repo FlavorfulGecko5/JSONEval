@@ -73,7 +73,7 @@ public class StringOperand : PrimitiveOperand
     */
 
     /// <inheritdoc/>
-    public override string ToString()
+    public string GetValueString()
     {
         return value;
     }
