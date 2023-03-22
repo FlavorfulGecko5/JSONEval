@@ -29,52 +29,52 @@ using JSONEval.ExpressionEvaluation;
 public class ParserTests
 {
     private static string jsonA =
-@"
-{
-    $intVar$: 3,
-    $decVar$: 5.5,
-    $boolVar$: true,
-    $expVar$: $5 + 2$,
+    @"
+    {
+        'intVar': 3,
+        'decVar': 5.5,
+        'boolVar': true,
+        'expVar': '5 + 2',
 
-    $!comment$: 4534,
+        '!comment': 4534,
 
-    $listVar$: [0, 5, false],
+        'listVar': [0, 5, false],
 
-    $objVar$: {
-        $int$: 5,
-        $Value$: 532,
+        'objVar': {
+            'int': 5,
+            'Value': 532,
 
-        $! comment   $: [null, {}]
-    },
-
-    $nest$: [[{$Value$: 6}], 4],
-
-    $obj_list$: {
-        $Value$: [true],
-
-        $extra$: [5]
-    },
-
-    $typetesting$: {
-        $Type$: $standard$,
-        $Value$: 9,
-
-        $stype$: {
-            $Type$: $string$,
-            $Value$: [true, $ yo$]
+            '! comment   ': [null, {}]
         },
 
-        $etype$: {
-            $Type$: $expression$,
-            $Value$: [3, 2]
+        'nest': [[{'Value': 6}], 4],
+
+        'obj_list': {
+            'Value': [true],
+
+            'extra': [5]
+        },
+
+        'typetesting': {
+            'Type': 'standard',
+            'Value': 9,
+
+            'stype': {
+                'Type': 'string',
+                'Value': [true, ' yo']
+            },
+
+            'etype': {
+                'Type': 'expression',
+                'Value': [3, 2]
+            }
+        },
+
+        'novalue': {
+
         }
-    },
-
-    $novalue$: {
-
     }
-}
-".Replace('$', '"');
+    ";
 
     private static VarDictionary resultsA = new VarDictionary()
     {
@@ -99,13 +99,13 @@ public class ParserTests
     };
 
     private static string jsonB =
-@"
-{
-    $StringExpressions$: false,
+    @"
+    {
+        'StringExpressions': false,
 
-    $realstring$: $345$
-}
-".Replace('$', '"');
+        'realstring': '345'
+    }
+    ";
 
     private static VarDictionary resultsB = new VarDictionary()
     {
@@ -113,32 +113,32 @@ public class ParserTests
     };
 
     private static string jsonC = 
-@"
-{
-    $Functions$: {
-        $abc$: {
-            $Parameters$: [$primitive$, $ expression   $, $reference$],
-            $Definition$: [234, $ + 45$]
+    @"
+    {
+        'Functions': {
+            'abc': {
+                'Parameters': ['primitive', ' expression   ', 'reference'],
+                'Definition': [234, ' + 45']
+            }
         }
     }
-}
-".Replace('$', '"');
+    ";
 
     private static FunctionDictionary funcC = new FunctionDictionary()
     {
         {"abc", new ExpressionFunction("234 + 45", FxParamType.PRIMITIVE, FxParamType.EXPRESSION, FxParamType.REFERENCE)}
     };
 
-private static string jsonD =
-@"
-{
-    $resA$: 345,
-    $resB$: {
-        $i$: 5.4
-    },
-    $keep$: 900
-}
-".Replace('$', '"');
+    private static string jsonD =
+    @"
+    {
+        'resA': 345,
+        'resB': {
+            'i': 5.4
+        },
+        'keep': 900
+    }
+    ";
 
     private static VarDictionary resultsD = new VarDictionary()
     {
