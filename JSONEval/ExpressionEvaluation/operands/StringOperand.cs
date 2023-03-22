@@ -58,7 +58,7 @@ public class StringOperand : PrimitiveOperand
     */
 
     /// <inheritdoc/>
-    public bool Equals(Operand b)
+    public override bool Equals(Operand b)
     {
         switch(b)
         {
@@ -68,18 +68,24 @@ public class StringOperand : PrimitiveOperand
         return false;
     }
 
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return "'" + value + "' (String)";
+    }
+
     /*
     * PrimitiveOperand method implementations
     */
 
     /// <inheritdoc/>
-    public string GetValueString()
+    public override string GetValueString()
     {
         return value;
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Add(PrimitiveOperand b)
+    public override PrimitiveOperand Add(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -97,61 +103,61 @@ public class StringOperand : PrimitiveOperand
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand UnaryAdd()
+    public override PrimitiveOperand UnaryAdd()
     {
         throw GenerateError("unary addition");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Sub(PrimitiveOperand b)
+    public override PrimitiveOperand Sub(PrimitiveOperand b)
     {
         throw GenerateError("subtraction");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand UnarySub()
+    public override PrimitiveOperand UnarySub()
     {
         throw GenerateError("unary subtraction");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Mult(PrimitiveOperand b)
+    public override PrimitiveOperand Mult(PrimitiveOperand b)
     {
         throw GenerateError("multiplication");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Div(PrimitiveOperand b)
+    public override PrimitiveOperand Div(PrimitiveOperand b)
     {
         throw GenerateError("division");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Rem(PrimitiveOperand b)
+    public override PrimitiveOperand Rem(PrimitiveOperand b)
     {
         throw GenerateError("remainder operations");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand And(PrimitiveOperand b)
+    public override PrimitiveOperand And(PrimitiveOperand b)
     {
         throw GenerateError("bitwise/logical and operations");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Or(PrimitiveOperand b)
+    public override PrimitiveOperand Or(PrimitiveOperand b)
     {
         throw GenerateError("bitwise/logical or operations");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Not()
+    public override PrimitiveOperand Not()
     {
         throw GenerateError("bitwise/logical not operations");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand Equal(PrimitiveOperand b)
+    public override PrimitiveOperand Equal(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -162,7 +168,7 @@ public class StringOperand : PrimitiveOperand
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand NotEqual(PrimitiveOperand b)
+    public override PrimitiveOperand NotEqual(PrimitiveOperand b)
     {
         switch (b)
         {
@@ -173,25 +179,25 @@ public class StringOperand : PrimitiveOperand
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand LessThan(PrimitiveOperand b)
+    public override PrimitiveOperand LessThan(PrimitiveOperand b)
     {
         throw GenerateError("less-than comparisons");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand LessThanEqual(PrimitiveOperand b)
+    public override PrimitiveOperand LessThanEqual(PrimitiveOperand b)
     {
         throw GenerateError("less-than-equal comparisons");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand GreaterThan(PrimitiveOperand b)
+    public override PrimitiveOperand GreaterThan(PrimitiveOperand b)
     {
         throw GenerateError("greater-than comparisons");
     }
 
     /// <inheritdoc/>
-    public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
+    public override PrimitiveOperand GreaterThanEqual(PrimitiveOperand b)
     {
         throw GenerateError("greater-than-equal comparisons");
     }

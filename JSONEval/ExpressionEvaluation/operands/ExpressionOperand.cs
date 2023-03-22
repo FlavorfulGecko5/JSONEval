@@ -62,7 +62,7 @@ public class ExpressionOperand : Operand
     */
 
     /// <inheritdoc/>
-    public bool Equals(Operand b)
+    public override bool Equals(Operand b)
     {
         switch(b)
         {
@@ -70,5 +70,11 @@ public class ExpressionOperand : Operand
             return value.Equals(b1.value) && localVars.Equals(b1.localVars);
         }
         return false;
+    }
+
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        return "'" + value + "' (Expression, " + localVars.Count + " Local Vars)";
     }
 }

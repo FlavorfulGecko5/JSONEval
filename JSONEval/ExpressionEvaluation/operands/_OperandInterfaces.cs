@@ -24,26 +24,34 @@ namespace JSONEval.ExpressionEvaluation;
 /// <summary>
 /// Any Operand useable in expressions
 /// </summary>
-public interface Operand 
+public abstract class Operand 
 {
     /// <summary>
     /// Determines whether this Operand is equivalent to another Operand
     /// </summary>
     /// <param name="b">Operand to compare with</param>
     /// <returns>True if the two Operands are equal, otherwise False</returns>
-    public bool Equals(Operand b);
+    public abstract bool Equals(Operand b);
+
+    /// <summary>
+    /// Generates a string representation of this object
+    /// </summary>
+    /// <returns>
+    /// A string stating the Operand's value, type, and any other relevant details. 
+    /// </returns>
+    public abstract override string ToString();
 }
 
 /// <summary>
 /// An Operand useable by operators to produce another Operand
 /// </summary>
-public interface PrimitiveOperand : Operand
+public abstract class PrimitiveOperand : Operand
 {
     /// <summary>
     /// Gets the string representation of this PrimitiveOperand's value
     /// </summary>
     /// <returns>The string representation of the PrimitiveOperand's value</returns>
-    public string GetValueString();
+    public abstract string GetValueString();
 
     /// <summary>
     /// Performs addition using this operand.
@@ -53,7 +61,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Add(PrimitiveOperand b);
+    public abstract PrimitiveOperand Add(PrimitiveOperand b);
 
     /// <summary>
     /// Performs unary addition using this operand.
@@ -62,7 +70,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand UnaryAdd();
+    public abstract PrimitiveOperand UnaryAdd();
 
     /// <summary>
     /// Performs subtraction using this operand.
@@ -72,7 +80,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Sub(PrimitiveOperand b);
+    public abstract PrimitiveOperand Sub(PrimitiveOperand b);
 
     /// <summary>
     /// Performs unary subtraction using this operand.
@@ -81,7 +89,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand UnarySub();
+    public abstract PrimitiveOperand UnarySub();
 
     /// <summary>
     /// Performs multiplication using this operand.
@@ -91,7 +99,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Mult(PrimitiveOperand b);
+    public abstract PrimitiveOperand Mult(PrimitiveOperand b);
 
     /// <summary>
     /// Performs division using this operand.
@@ -101,7 +109,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Div(PrimitiveOperand b);
+    public abstract PrimitiveOperand Div(PrimitiveOperand b);
 
     /// <summary>
     /// Performs the modulus (remainder) operation using this operand.
@@ -111,7 +119,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Rem(PrimitiveOperand b);
+    public abstract PrimitiveOperand Rem(PrimitiveOperand b);
 
     /// <summary>
     /// Performs the bitwise/logical AND operation using this operand
@@ -121,7 +129,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand And(PrimitiveOperand b);
+    public abstract PrimitiveOperand And(PrimitiveOperand b);
 
     /// <summary>
     /// Performs the bitwise/logical OR operation using this operand
@@ -131,7 +139,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Or(PrimitiveOperand b);
+    public abstract PrimitiveOperand Or(PrimitiveOperand b);
 
     /// <summary>
     /// Performs the bitwise/logical NOT operation using this operand.
@@ -140,7 +148,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Not();
+    public abstract PrimitiveOperand Not();
 
     /// <summary>
     /// Performs an equality comparison using this operand
@@ -150,7 +158,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand Equal(PrimitiveOperand b);
+    public abstract PrimitiveOperand Equal(PrimitiveOperand b);
 
     /// <summary>
     /// Performs an inequality comparison using this operand
@@ -160,7 +168,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand NotEqual(PrimitiveOperand b);
+    public abstract PrimitiveOperand NotEqual(PrimitiveOperand b);
 
     /// <summary>
     /// Performs a less-than comparison using this operand
@@ -170,7 +178,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand LessThan(PrimitiveOperand b);
+    public abstract PrimitiveOperand LessThan(PrimitiveOperand b);
 
     /// <summary>
     /// Performs a less-than-or-equal-to comparison using this operand
@@ -180,7 +188,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand LessThanEqual(PrimitiveOperand b);
+    public abstract PrimitiveOperand LessThanEqual(PrimitiveOperand b);
 
     /// <summary>
     /// Performs a greater-than comparison using this operand
@@ -190,7 +198,7 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand GreaterThan(PrimitiveOperand b);
+    public abstract PrimitiveOperand GreaterThan(PrimitiveOperand b);
 
     /// <summary>
     /// Performs a greater-than-or-equal-to comparison using this operand
@@ -200,5 +208,5 @@ public interface PrimitiveOperand : Operand
     /// <exception cref="OperatorEvaluationException">
     /// The operation cannot be performed on this operand or combination of operands.
     /// </exception>
-    public PrimitiveOperand GreaterThanEqual(PrimitiveOperand b);
+    public abstract PrimitiveOperand GreaterThanEqual(PrimitiveOperand b);
 }

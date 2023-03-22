@@ -126,4 +126,16 @@ public class VarDictionary : Dictionary<string, Operand>
                 return false;
         return true;
     }
+
+    /// <summary>
+    /// Creates a string representation of this VarDictionary's contents
+    /// </summary>
+    public override string ToString()
+    {
+        string msg = "";
+        int i = 1;
+        foreach(string key in Keys)
+            msg += i++ + ". '" + key + "' = " + this[key].ToString() + '\n';
+        return msg;
+    }
 }
