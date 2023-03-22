@@ -4,7 +4,9 @@ A .Net C# library that parses JSON files for variables and uses them to dynamica
 JSONEval is available on Nuget:
 https://www.nuget.org/packages/FG5.JSONEval/
 
-Source Code is available on GitHub: https://github.com/FlavorfulGecko5/JSONEval
+[Source Code](https://github.com/FlavorfulGecko5/JSONEval) 
+
+[Documentation](https://github.com/FlavorfulGecko5/JSONEval/tree/master/documentation)
 
 ## Dependencies
 * The Expression Evaluator is built entirely from scratch, with no third-party libraries or dependencies
