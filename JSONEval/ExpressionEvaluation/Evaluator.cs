@@ -88,14 +88,14 @@ public static class Evaluator
         globalVars.AddBoolVar("false", false);
 
         functions = new FunctionDictionary();
-        functions.Add("if", new CodedFunction_IfElse());
-        functions.Add("loop", new CodedFunction_Loop());
-        functions.Add("and", new CodedFunction_And());
-        functions.Add("or", new CodedFunction_Or());
-        functions.Add("int", new CodedFunction_IntCast());
-        functions.Add("decimal", new CodedFunction_DecimalCast());
-        functions.Add("bool", new CodedFunction_BoolCast());
-        functions.Add("string", new CodedFunction_StringCast());
+        functions.Add("if", PrefabFunctions.IfElse);
+        functions.Add("loop", PrefabFunctions.Loop);
+        functions.Add("and", PrefabFunctions.And);
+        functions.Add("or", PrefabFunctions.Or);
+        functions.Add("int", PrefabFunctions.IntCast);
+        functions.Add("decimal", PrefabFunctions.DecimalCast);
+        functions.Add("bool", PrefabFunctions.BoolCast);
+        functions.Add("string", PrefabFunctions.StringCast);
     }
 
     /// <summary>
@@ -666,7 +666,7 @@ public static class Evaluator
                 break;
 
                 case CodedFunction f2:
-                    try {operands.Push(f2.eval(callVariables)); }
+                    try {operands.Push(f2.def.Invoke(callVariables)); }
                     catch(CodedFunctionException e)
                     {
                         throw SyntaxError(closeIndex, e.Message);

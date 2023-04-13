@@ -78,13 +78,15 @@ See `JSONEval/ExpressionEvaluation/functions/FunctionDef.cs` for class definitio
 
 ### Coded Functions
 
-To create a hard-coded function, you must create a class inheriting the abstract class `CodedFunction`
+To create a hard-coded function, create an instance of the `CodedFunction` class.
+* This requires defining an instance of the delegate `CodedFunction.Definition`
+* See `JSONEval/ExpressionEvaluation/functions/CodedFunction.cs` 
 
-See `JSONEval/ExpressionEvaluation/functions/CodedFunction.cs` for class definition and all implementations of `CodedFunction` in the evaluator's Standard Function Library. These standard functions should provide adequate examples to learn from.
+For examples, see `JSONEval/ExpressionEvaluation/functions/PrefabFunctions.cs`. This file contains all `CodedFunction` instances defined for the evaluator's Standard Function Library. These should provide adequate examples to learn from.
 
 ### Expression-Based Functions
 
-For Expression-Based Functions, simply create an instance of the `ExpressionFunction` class
+For Expression-Based Functions, create an instance of the `ExpressionFunction` class.
 * See `JSONEval/ExpressionEvaluation/functions/ExpressionFunction.cs`
 
 Example:
