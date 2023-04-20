@@ -64,7 +64,7 @@ public static class Evaluator
         {'&', 400},
         {'|', 300},
 
-        {'(', -10000}, {'[', -10000}
+        {')', -10000}, {']', -10000}
     };
 
     /// <summary>
@@ -133,8 +133,8 @@ public static class Evaluator
         * Used to ensure proper parentheses/bracket balance
         * May contain three symbols:
         * e - empty stack
-        * p - parentheses
-        * b - bracket
+        * ) - parentheses (symbols chosen for code reuse)
+        * ] - bracket
         */
         Stack<char> balanceChecker = new Stack<char>();
         balanceChecker.Push('e');
@@ -280,8 +280,8 @@ public static class Evaluator
                     case OperandTokenType.NONE:
                     if(lastToken == TokenType.OPERAND)
                         throw SyntaxError(inc, "Cannot place opening-parentheses after an operand");
-                    balanceChecker.Push('p');
-                    operators.Push(c);
+                    balanceChecker.Push(')');
+                    operators.Push(')');
                     lastToken = TokenType.OPERATOR;
                     break;
 
@@ -290,46 +290,39 @@ public static class Evaluator
                 }
                 break;
 
-                case ')':
-                TryPushOperand();
-                if (lastToken != TokenType.OPERAND)
-                    throw SyntaxError(inc, "A closing-parentheses must be placed after an operand");
-                if(balanceChecker.Peek() != 'p')
-                    throw SyntaxError(inc, "This closing-parentheses lacks a properly placed opening-parentheses");
-                balanceChecker.Pop();
-                while(operators.Peek() != '(')
-                    eval();
-                operators.Pop();               // At this point, the contents of the parentheses
-                lastToken = TokenType.OPERAND; // Have been resolved to a single operand
-                break;
-
                 case '[':
                 if(activeType != OperandTokenType.VARIABLE)
                     throw SyntaxError(inc, "Brackets may only be used as part of variable names.");
-                balanceChecker.Push('b');
+                balanceChecker.Push(']');
                 activeType = OperandTokenType.STRING;
                 TryPushOperand();  // The current name will be popped from
-                operators.Push(c); // the stack after resolving the bracket contents
+                operators.Push(']'); // the stack after resolving the bracket contents
                 lastToken = TokenType.OPERATOR;
                 break;
 
-                case ']':
+                case ')': case ']':
                 TryPushOperand();
                 if(lastToken != TokenType.OPERAND)
-                    throw SyntaxError(inc, "A closing-bracket must be placed after an operand");
-                if(balanceChecker.Peek() != 'b')
-                    throw SyntaxError(inc, "This closing-bracket lacks a properly placed opening-bracket");
+                    throw SyntaxError(inc, "Closing symbols must be placed after operands.");
+                if(balanceChecker.Peek() != c)
+                    throw SyntaxError(inc, "This closing symbol lacks a properly placed opening symbol");
                 balanceChecker.Pop();
-                while(operators.Peek() != '[')
+                while(operators.Peek() != c)
                     eval();
-                operators.Pop();   // final point of similarity between closing parentheses and bracket switch  
-                if(!(operands.Peek() is IntOperand))
-                    throw SyntaxError(inc, "Bracketed expression must resolve to an integer!");
-                IntOperand b1 = (IntOperand)operands.Pop();
-                StringOperand priorName = (StringOperand)operands.Pop();
-                activeOperand = priorName.value + '[' + b1.value + ']';
-                activeType = OperandTokenType.VARIABLE;
-                lastToken = TokenType.OPERATOR; // No operand should follow another operand
+                operators.Pop();
+                
+                if(c == ')')
+                    lastToken = TokenType.OPERAND; // Parentheses contents resolved to single operand
+                else
+                {
+                    if(!(operands.Peek() is IntOperand))
+                        throw SyntaxError(inc, "Bracketed expression must resolve to an integer!");
+                    IntOperand b1 = (IntOperand)operands.Pop();
+                    StringOperand priorName = (StringOperand)operands.Pop();
+                    activeOperand = priorName.value + '[' + b1.value + ']';
+                    activeType = OperandTokenType.VARIABLE;
+                    lastToken = TokenType.OPERATOR; // No operand can follow another operand
+                }    
                 break;
 
                 default:
