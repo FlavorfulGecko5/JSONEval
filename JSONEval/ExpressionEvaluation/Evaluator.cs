@@ -149,12 +149,8 @@ public static class Evaluator
             char c = exp.value[inc];
 
             if(Char.IsWhiteSpace(c))
-            {
                 TryPushOperand();
-                continue;
-            }
-
-            if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_')
+            else if((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_')
             {
                 switch(activeType)
                 {
@@ -168,10 +164,8 @@ public static class Evaluator
                     throw SyntaxError(inc, "Improper placement of a letter or underscore.");
                 }
                 activeOperand += c;
-                continue;
             }
-                
-            switch(c)
+            else switch(c)
             {
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
@@ -255,20 +249,13 @@ public static class Evaluator
                 case '=': case '&': case '|': 
                 TryPushOperand();
                 LABEL_EVAL:
-                switch(c)
+                if(precedence[c] == PRECEDENCE_UNARY)
                 {
-                    // Technically this has already been verified for unary add/sub
-                    case '~': case SYM_UNARY_ADDITION: case SYM_UNARY_SUBTRACTION:
-                    if(lastToken == TokenType.OPERAND)
+                    if (lastToken == TokenType.OPERAND) // Already verified for unary add/sub
                         throw SyntaxError(inc, "Unary operators cannot be placed after an operand.");
-                    break;
-
-                    default:
-                    if(lastToken != TokenType.OPERAND)
-                        throw SyntaxError(inc, "Binary operators must be placed after an operand.");
-                    break;
-
                 }
+                else if(lastToken != TokenType.OPERAND)
+                    throw SyntaxError(inc, "Binary operators must be placed after an operand.");
                 while(operators.Count > 0)
                 {
                     // <= instead of < Causes left-right evaluation instead of right-left
@@ -335,17 +322,12 @@ public static class Evaluator
                 balanceChecker.Pop();
                 while(operators.Peek() != '[')
                     eval();
-                operators.Pop();
-                switch(operands.Pop())
-                {
-                    case IntOperand b1:
-                    StringOperand priorName = (StringOperand)operands.Pop();
-                    activeOperand = priorName.value + '[' + b1.value + ']';
-                    break;
-
-                    default:
+                operators.Pop();   // final point of similarity between closing parentheses and bracket switch  
+                if(!(operands.Peek() is IntOperand))
                     throw SyntaxError(inc, "Bracketed expression must resolve to an integer!");
-                }
+                IntOperand b1 = (IntOperand)operands.Pop();
+                StringOperand priorName = (StringOperand)operands.Pop();
+                activeOperand = priorName.value + '[' + b1.value + ']';
                 activeType = OperandTokenType.VARIABLE;
                 lastToken = TokenType.OPERATOR; // No operand should follow another operand
                 break;
@@ -483,23 +465,14 @@ public static class Evaluator
                     bool isGlobal = globalVars.ContainsKey(activeOperand);
                     bool isLocal = exp.localVars.ContainsKey(activeOperand);
 
-                    // Checking for variable presence in both dictionaries shouldn't be necessary
-                    // if the rest of the code is put together properly
                     if(!isGlobal && !isLocal)
                         throw SyntaxError(inc, "Could not find variable '" + activeOperand + "'");
                     
                     Operand varValue = isLocal ? exp.localVars[activeOperand] : globalVars[activeOperand];
 
-                    switch(varValue)
-                    {
-                        case PrimitiveOperand v1:
-                        operands.Push(v1);
-                        break;
-
-                        case ExpressionOperand v2:
-                        operands.Push(recursiveCall(v2));
-                        break;
-                    }
+                    if(varValue is ExpressionOperand)
+                        operands.Push(recursiveCall( (ExpressionOperand)varValue ));
+                    else operands.Push( (PrimitiveOperand)varValue );
                 break;
             }
 
@@ -610,28 +583,22 @@ public static class Evaluator
 
             for(int i = 0; i < rawParms.Length; i++)
             {
+                ExpressionOperand parmExp = new ExpressionOperand(rawParms[i], exp.localVars);
                 switch(parmData[i])
                 {
                     case FxParamType.PRIMITIVE:
-                        ExpressionOperand toPrim = new ExpressionOperand(rawParms[i], exp.localVars);
-                        callVariables.Add("!" + i, recursiveCall(toPrim));
+                        callVariables.Add("!" + i, recursiveCall(parmExp));
                     break;
 
                     case FxParamType.EXPRESSION:
-                        callVariables.AddExpressionVar("!" + i, rawParms[i], exp.localVars);
+                        callVariables.Add("!" + i, parmExp);
                     break;
 
                     case FxParamType.REFERENCE:
-                        string refName;
-                        try 
-                        {
-                            ExpressionOperand toRef = new ExpressionOperand(rawParms[i], exp.localVars);
-                            refName = ((StringOperand)recursiveCall(toRef)).value;
-                        }
-                        catch(System.InvalidCastException) 
-                        {
+                        PrimitiveOperand parmExpResult = recursiveCall(parmExp);
+                        if(!(parmExpResult is StringOperand))
                             throw SyntaxError(closeIndex, "Reference parameter #" + (i + 1) + " must evaluate to a string");
-                        }
+                        string refName = ((StringOperand)parmExpResult).value;
 
                         bool isLocal = exp.localVars.ContainsKey(refName);
                         bool isGlobal = globalVars.ContainsKey(refName);
