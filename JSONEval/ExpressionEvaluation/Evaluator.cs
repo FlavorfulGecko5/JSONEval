@@ -229,10 +229,7 @@ public static class Evaluator
                 case '~': case '<': case '>':
                 TryPushOperand();
                 if(inc != exp.value.Length - 1 && exp.value[inc+1] == '=')
-                {
-                    c -= (char)5;
-                    inc++;
-                }
+                    c = (char)(exp.value[inc++] - 5);
                 goto LABEL_EVAL;
 
                 case '*': case '/': case '%': 
@@ -244,17 +241,14 @@ public static class Evaluator
                     if (lastToken == TokenType.OPERAND) // Already verified for unary add/sub
                         throw SyntaxError(inc, "Unary operators cannot be placed after an operand.");
                 }
-                else if(lastToken != TokenType.OPERAND)
-                    throw SyntaxError(inc, "Binary operators must be placed after an operand.");
-                while(operators.Count > 0)
+                else // Ensures right-left evaluation for unary operators
                 {
-                    // <= instead of < Causes left-right evaluation instead of right-left
-                    // For unary operations - we need to ensure right-left evaluation
-                    // This current setup relies on unary operators having the highest-precedence (other than sub-expressions)
-                    if((precedence[c] <= precedence[operators.Peek()]) && precedence[c] != PRECEDENCE_UNARY)
-                        eval();
-                    else
-                        break;
+                    if (lastToken != TokenType.OPERAND)
+                        throw SyntaxError(inc, "Binary operators must be placed after an operand.");
+                    while(operators.Count > 0) // <= For left-right evaluation, < for right-left
+                        if((precedence[c] <= precedence[operators.Peek()]))
+                            eval();
+                        else break;
                 }
                 operators.Push(c);
                 lastToken = TokenType.OPERATOR;
