@@ -67,6 +67,11 @@ switch(Evaluate("x + y"))
     string s = r4.value;
     break;
 }
+
+// Method 3: Cast the result to the raw data type.
+bool resultBool = (bool)Evaluate("true | some_boolean");
+double resultDouble = (double)Evaluate("5 * 2.3");
+int resultInt = (int)Evaluate("4 & 2");
 ```
 See the documentation for a breakdown on all the evaluator's features and nuances.
 

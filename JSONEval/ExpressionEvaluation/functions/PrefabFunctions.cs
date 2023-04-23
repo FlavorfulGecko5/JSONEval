@@ -37,18 +37,12 @@ public static class PrefabFunctions
     public static readonly CodedFunction IfElse = new CodedFunction(
         parms =>
         {
-            switch (parms["!0"])
-            {
-                case BoolOperand conditionalResult:
-                    if (conditionalResult.value)
-                        return Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
-                    else
-                        return Evaluator.Evaluate((ExpressionOperand)parms["!2"]);
-                default:
-                    throw new CodedFunctionException("The first parameter of an If function must resolve to a Boolean");
-            }
+            if(!(parms["!0"] is BoolOperand))
+                throw new CodedFunctionException("The first parameter of an If function must resolve to a Boolean");
+            if((bool)parms["!0"])
+                return Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
+            return Evaluator.Evaluate((ExpressionOperand)parms["!2"]);
         },
-
         FxParamType.PRIMITIVE,
         FxParamType.EXPRESSION,
         FxParamType.EXPRESSION
@@ -60,16 +54,15 @@ public static class PrefabFunctions
     public static readonly CodedFunction Loop = new CodedFunction(
         parms =>
         {
-            IntOperand start;
-            IntOperand end;
+            int start, end;
             PrimitiveOperand result = (PrimitiveOperand)parms["!2"];
             ExpressionOperand loopingExp = (ExpressionOperand)parms["!3"];
             string incVar = "!";
 
             try
             {
-                start = (IntOperand)parms["!0"];
-                end = (IntOperand)parms["!1"];
+                start = (int)parms["!0"];
+                end = (int)parms["!1"];
             }
             catch (System.InvalidCastException)
             {
@@ -83,7 +76,7 @@ public static class PrefabFunctions
                     break;
             }
 
-            for (int i = start.value; i <= end.value; i++)
+            for (int i = start; i <= end; i++)
             {
                 loopingExp.localVars[incVar] = new IntOperand(i);
                 result = result.Add(Evaluator.Evaluate(loopingExp));
@@ -107,10 +100,10 @@ public static class PrefabFunctions
             try
             {
                 PrimitiveOperand leftResult = Evaluator.Evaluate((ExpressionOperand)parms["!0"]);
-                if (((BoolOperand)leftResult).value)
+                if ((bool)leftResult)
                 {
                     PrimitiveOperand rightResult = Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
-                    if (((BoolOperand)rightResult).value)
+                    if ((bool)rightResult)
                         return BoolOperand.TRUE;
                     return BoolOperand.FALSE;
                 }
@@ -134,11 +127,11 @@ public static class PrefabFunctions
             try
             {
                 PrimitiveOperand leftResult = Evaluator.Evaluate((ExpressionOperand)parms["!0"]);
-                if (((BoolOperand)leftResult).value)
+                if ((bool)leftResult)
                     return BoolOperand.TRUE;
 
                 PrimitiveOperand rightResult = Evaluator.Evaluate((ExpressionOperand)parms["!1"]);
-                if (((BoolOperand)rightResult).value)
+                if ((bool)rightResult)
                     return BoolOperand.TRUE;
 
                 return BoolOperand.FALSE;

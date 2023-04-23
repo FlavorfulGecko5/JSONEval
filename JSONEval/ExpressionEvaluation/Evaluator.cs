@@ -591,7 +591,7 @@ public static class Evaluator
                         PrimitiveOperand parmExpResult = recursiveCall(parmExp);
                         if(!(parmExpResult is StringOperand))
                             throw SyntaxError(closeIndex, "Reference parameter #" + (i + 1) + " must evaluate to a string");
-                        string refName = ((StringOperand)parmExpResult).value;
+                        string refName = parmExpResult.GetValueString();
 
                         bool isLocal = exp.localVars.ContainsKey(refName);
                         bool isGlobal = globalVars.ContainsKey(refName);

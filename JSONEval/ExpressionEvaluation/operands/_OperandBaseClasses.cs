@@ -40,6 +40,47 @@ public abstract class Operand
     /// A string stating the Operand's value, type, and any other relevant details. 
     /// </returns>
     public abstract override string ToString();
+
+    /// <param name="a">Operand to cast</param>
+    /// <exception cref="System.InvalidCastException">
+    /// The Operand is not an instance of <see cref="IntOperand"/>
+    /// </exception>
+    public static explicit operator Int32(Operand a)
+    {
+        if(a is IntOperand)
+            return ((IntOperand)a).value;
+        throw new System.InvalidCastException("Operand could not be converted to an Integer");
+    }
+
+    /// <param name="a">Operand to cast</param>
+    /// <exception cref="System.InvalidCastException">
+    /// The Operand is not an instance of <see cref="IntOperand"/> or <see cref="DecimalOperand"/>
+    /// </exception>
+    public static explicit operator Double(Operand a)
+    {
+        switch(a)
+        {
+            case IntOperand a1:
+            return ((IntOperand)a1).value;
+
+            case DecimalOperand a2:
+            return ((DecimalOperand)a2).value;
+
+            default:
+            throw new System.InvalidCastException("Operand could not be converted to a Decimal");
+        }
+    }
+
+    /// <param name="a">Operand to cast</param>
+    /// <exception cref="System.InvalidCastException">
+    /// The Operand is not an instance of <see cref="BoolOperand"/>
+    /// </exception>
+    public static explicit operator Boolean(Operand a)
+    {
+        if(a is BoolOperand)
+            return ((BoolOperand)a).value;
+        throw new System.InvalidCastException("Operand could not be converted to a Boolean.");
+    }
 }
 
 /// <summary>
