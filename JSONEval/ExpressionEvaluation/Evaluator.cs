@@ -200,30 +200,20 @@ public static class Evaluator
                     throw SyntaxError(inc, "Can't transition to string while parsing another operand.");
                 activeType = OperandTokenType.STRING;
 
-                int stringEndIndex = -1;
-                for(int j = inc+1; j < exp.value.Length; j++)
-                    if(exp.value[j] == '\'' && exp.value[j-1] != '`')
-                    {
-                        stringEndIndex = j;
-                        break;
-                    }
+                int stringEndIndex = exp.value.IndexOf('\'', inc + 1);
                 if(stringEndIndex == -1)
                     throw SyntaxError(exp.value.Length - 1, "String literal has no end-quote");
                 
-                // At this point we know the start and end index of the string,
-                // and that the index before the end quote does not have a `
                 for(int j = inc+1; j < stringEndIndex; j++)
                     if(exp.value[j] == '`')
-                    {
-                        switch(exp.value[j+1])
+                        switch(exp.value[j++ + 1])
                         {
-                            case '\'': activeOperand += '\''; break;
+                            case '`': activeOperand += '`'; break;
+                            case 'q': activeOperand += '\''; break;
                             case 'n':  activeOperand += '\n'; break;
                             case 't':  activeOperand += '\t'; break;
-                            default:   activeOperand += '`'; j--; break;
+                            default: throw SyntaxError(j, "Unrecognized escape sequence");
                         }
-                        j++;
-                    }
                     else
                         activeOperand += exp.value[j];
                 TryPushOperand();
@@ -525,8 +515,6 @@ public static class Evaluator
                         case ')':
                         switch(extraDelimiters.Peek())
                         {
-                            case 's': break;
-
                             case 'p': extraDelimiters.Pop(); break;
 
                             case 'e':
@@ -539,17 +527,10 @@ public static class Evaluator
                         break;
 
                         case '\'':
-                        switch(extraDelimiters.Peek())
-                        {
-                            case 'p': case 'e':
+                        if(extraDelimiters.Peek() == 's')
+                            extraDelimiters.Pop();
+                        else
                             extraDelimiters.Push('s');
-                            break;
-
-                            case 's':
-                            if(exp.value[closeIndex - 1] != '`') // Accounts for escape sequence
-                                extraDelimiters.Pop();
-                            break;
-                        }
                         break;
 
                         case ',':

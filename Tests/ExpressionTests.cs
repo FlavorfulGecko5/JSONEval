@@ -89,7 +89,7 @@ public class ExpressionTests
         assert("'  hello ' + 'everyone'", "  hello everyone");
 
         // Iteration #4 String Escape Sequence Tests
-        assert("'`''", "'");
+        assert("'`q'", "'");
 
         // Iteration #5 basic variable tests
         Evaluator.globalVars.AddIntVar("firstvar", 34);
@@ -123,7 +123,7 @@ public class ExpressionTests
         assert("3 & 6 ", "2");
         assert("true & true", "True");
         assert("false & true", "False");
-        assert ("false & false", "False");
+        assert("false & false", "False");
         assert("7 | 8", "15");
         assert("true | true", "True");
         assert("true | false", "True");
@@ -157,8 +157,8 @@ public class ExpressionTests
         Evaluator.functions.Add("funcA", new ExpressionFunction("!0 + !1 + !2", FxParamType.PRIMITIVE, FxParamType.PRIMITIVE, FxParamType.PRIMITIVE));
         Evaluator.functions.Add("delimtest", new ExpressionFunction("!0", FxParamType.PRIMITIVE));
         assert("funcA(   1 , 2  , 3 )", "6");
-        assert("funcA(  'hello('  , 'door', '')"  , "hello(door");
-        assert("DELIMTEST( ',()(`',,(`'`'),()(,,())' )", ",()(',,(''),()(,,())");
+        assert("funcA(  'hello('  , 'door', '')", "hello(door");
+        assert("DELIMTEST( ',()(`q,,(`q`q),()(,,())' )", ",()(',,(''),()(,,())");
         assert("delimtest(1)+ 3", "4");
         assert("delimtest(delimtest('(boo)'))", "(boo)");
         assert("delimtest((~true))", "False");
@@ -193,7 +193,7 @@ public class ExpressionTests
 
         // Iteration #11 String escape sequence revisions
         assert("'`n'", "\n");
-        assert("'``t'", "`\t");
+        assert("'```t'", "`\t");
 
         // Iteration #12 More Functions
         assert("int('-400')", "-400");

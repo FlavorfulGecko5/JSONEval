@@ -44,15 +44,16 @@ Behavior defined in `JSONEval/ExpressionEvaluation/operands/StringOperand.cs`
 The evaluator uses backticks to identify escape sequences in string literals:
 * ``` `n ``` represents a newline character (commonly seen as `\n`).
 * ``` `t ``` represents a tab character (commonly seen as `\t`).
-* ``` `' ``` represents a single quote
+* ``` `q ``` represents a single quote
+* ``` `` ``` represents a backtick
 
-Backticks prefacing any other character are treated as a normal backtick.
+Backticks prefacing any other character cause errors.
 
 ```csharp
 Evaluate(" '`n' "); // A string literal containing only a newline
 Evaluate(" '`t' "); // A string literal containing only a tab character
-Evaluate(" '`'' "); // A string literal containing only a single quote
-Evaluate(" '`c' "); // The string literal "`c"
+Evaluate(" '`q' "); // A string literal containing only a single quote
+Evaluate(" '``c' "); // The string literal "`c"
 ```
 
 > Why backticks? Simply put, escape sequences become a nuisance to use if the evaluator uses backslashes. String operands will most likely have their backslashed escape sequences preprocessed before reaching the evaluator, such as when using the JSON parser or when passing the expression as a string in a C# program. To prevent inconsistent and confusing behavior, it's best if the evaluator uses a different character for it's escape sequences.
