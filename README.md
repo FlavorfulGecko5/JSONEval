@@ -8,6 +8,8 @@ https://www.nuget.org/packages/FG5.JSONEval/
 
 [Documentation](https://github.com/FlavorfulGecko5/JSONEval/tree/master/documentation)
 
+Patch notes for different versions are available on the [commit log](https://github.com/FlavorfulGecko5/JSONEval/commits/master).
+
 ## Dependencies
 * The Expression Evaluator is built entirely from scratch, with no third-party libraries or dependencies
 * The JSON Parser utilizes [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/#readme-body-tab)
